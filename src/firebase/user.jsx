@@ -141,16 +141,31 @@ export const getAllUser = async() => {
 
 export const getParentByChildId = async (childId) => {
   const db = fire.firestore();
-  let ans = await db.collection("users")
+  let data1 = await db.collection("users")
     .get()
     let child;
-    ans.docs.forEach(i => {
+    data1.docs.forEach(i => {
       i.data().children.forEach(c => {
         if(c === childId) return child = i.id
       })
     })
 
     return child;
+};
+
+export const getTransactionsById = async(pId) => {
+  const db = fire.firestore();
+  let data = await db.collection("transactions")
+  .get()
+
+  let res = []
+  data.docs.forEach(i => {
+    if(i.data().receiver_id === pId && i.data().state === "Pending"){
+      res.push(i.data())
+    }
+  })
+  
+  return res;
 };
 
 //Updating Document in FB Firestore

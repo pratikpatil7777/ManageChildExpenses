@@ -5,6 +5,7 @@ import { getVasooliByFilter } from "./../firebase/vasooli";
 import fire from "./../firebase/fire";
 import Vasoolicard from "./../components/allocateMoney/vasoolicard";
 import Empty from "./../components/general/empty.component";
+import Form from "react-bootstrap/Form";
 
 export default function RequestedMoneyV() {
   const [filter, setfilter] = useState("ALL");
@@ -16,22 +17,22 @@ export default function RequestedMoneyV() {
   const getDataFromFB = () => {
     let email = user.email;
     setloading(true);
-    setSendToCardFilter(filter);
-    getVasooliByFilter(
-      email,
-      filter,
-      (res) => {
-        let Arr = [];
-        res.forEach((item) => {
-          //console.log(item);
-          Arr.push({ ...item.data(), ["id"]: item.id });
-        });
-        console.log(Arr);
-        setVasooliArr(Arr);
-        setloading(false);
-      },
-      (err) => console.log(err)
-    );
+
+    // setSendToCardFilter(filter);
+    // getVasooliByFilter(
+    //   email,
+    //   filter,
+    //   (res) => {
+    //     let Arr = [];
+    //     res.forEach((item) => {
+    //       Arr.push({ ...item.data(), ["id"]: item.id });
+    //     });
+    //     console.log(Arr);
+    //     setVasooliArr(Arr);
+    //     setloading(false);
+    //   },
+    //   (err) => console.log(err)
+    // );
   };
 
   useEffect(() => {
@@ -58,25 +59,34 @@ export default function RequestedMoneyV() {
     <Fragment>
       <div className="row" style={{ marginBottom: "7px" }}>
         <div className="col-6 col-sm-6 col-md-6">
-          <select
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Please enter receiver ID"
+          ></input>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Amount"
+          ></input>
+          <Form.Select
             className="custom-select w-100"
             value={filter}
             onChange={(e) => setfilter(e.target.value)}
+            aria-label="Default select example"
           >
-            {/* Here list down all the children and  */}
-            {/* <option value="ALL">All</option>
-            <option value="PAY">Pay your Debt</option>
-            <option value="ASK">Ask for Vasooli</option> */}
-          </select>
-        </div>
-        <div className="col-6 col-sm-6 col-md-6 d-flex flex-row">
+            <option value="">Select an Option</option>
+            <option value="Food">Food</option>
+            <option value="Fees">Fees</option>
+            <option value="Commute">Commute</option>
+            <option value="Stationary">Stationary</option>
+            <option value="Medicine">Medicine</option>
+            <option value="Bill">Bill</option>
+            <option value="Other">Other</option>
+          </Form.Select>
           <button className="btn btn-outline-info mx-1" onClick={getDataFromFB}>
-            Apply
+            submit
           </button>
-          <Link to="/newAllocate" className="btn btn-success mx-1">
-            New
-            <i className="fa fa-plus mx-1"></i>
-          </Link>
         </div>
       </div>
       {/* {!loading ? (

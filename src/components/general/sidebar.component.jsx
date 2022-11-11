@@ -180,7 +180,9 @@ export default function SidebarV({ control, cleanuser, user, loggedin, dp }) {
                       textShadow:
                         "0 0 20px #ae4825,0 0 80px #ae4825, 0 0 90px #ae4825, 0 0 100px #ae4825,   0 0 150px #ae4825",
                     }}
-                  ></strong>
+                  >
+                    Request Money
+                  </strong>
                 ) : (
                   <strong>Request Money</strong>
                 )}

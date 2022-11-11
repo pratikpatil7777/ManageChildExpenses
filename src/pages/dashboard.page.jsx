@@ -51,7 +51,7 @@ export default function DashboardV() {
     getDataFromFB();
   }, []);
 
-  console.log("dashhhhh------", userType, userObj);
+  // console.log("dashhhhh------", userType, userObj);
 
   // console.log("-------------"+allUser)
   // const [TransactionsArr, setTransactionsArr] = useState([]);

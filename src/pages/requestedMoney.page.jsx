@@ -7,7 +7,8 @@ import Vasoolicard from "./../components/allocateMoney/vasoolicard";
 import Empty from "./../components/general/empty.component";
 import Form from "react-bootstrap/Form";
 import fire from "../firebase/fire";
-import { getUserData } from "../firebase/user";
+import { getUserData, getParentByChildId } from "../firebase/user";
+import { requestMoney } from "./../firebase/vasooli";
 export default function RequestedMoneyV() {
   const [filter, setfilter] = useState("ALL");
   const [SendToCardFilter, setSendToCardFilter] = useState("ALL");
@@ -16,6 +17,7 @@ export default function RequestedMoneyV() {
   // const [user, setuser] = useState({});
   const [userObj, setUserObj] = useState({});
   const [isParent, setIsParent] = useState(false);
+  const [parentID, setParentID] = useState("");
 
   let loc = useLocation();
   const getDataFromFB = () => {
@@ -42,18 +44,47 @@ export default function RequestedMoneyV() {
     getDataFromFB();
   }, []);
 
-  // console.log("req------", isParent, userObj);
+  // const handleGetParentId = (id)=> {
+  //   const
+  // }
+  // useEffect(() => {
+  //   if (isParent === true) return;
+  //   if (isParent === false) {
+  //     let u1 = fire.auth().currentUser;
+  //     const getID = async (id) => {
+  //       await getParentByChildId(id).then((data) => {
+  //         console.log("iiiiiisdddddd", data);
+  //         setParentID(data);
+  //       });
+  //     };
+  //     getID(u1.uid);
+  //     // await getParentByChildId(u1.uid).then((pID) => {
+  //     //   console.log("ppppiiiidddd", pID);
+  //     //   setParentID(pID);
+  //     // });
+  //   }
+  // }, []);
+
+  let u1 = fire.auth().currentUser;
+  const idid = async () => {
+    await getParentByChildId(u1.uid).then((data) => {
+      console.log("====== " + data);
+    });
+  };
+  idid();
+
+  // console.log("pID------", parentID);
 
   return (
     <Fragment>
       <div className="row" style={{ marginBottom: "7px" }}>
         {isParent === false ? (
           <div className="col-6 col-sm-6 col-md-6">
-            <input
+            {/* <input
               type="text"
               className="form-control"
               placeholder="Please enter receiver ID"
-            ></input>
+            ></input> */}
             <input
               type="text"
               className="form-control"

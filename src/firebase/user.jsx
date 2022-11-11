@@ -139,23 +139,25 @@ export const getAllUser = async() => {
 //   console.log("===="+data)
 // })
 
-export const getParentByChildId = async(childId) =>{
+export const getParentByChildId = async (childId) => {
   const db = fire.firestore();
-  db.collection("user").get().then((querySnapshot) => {
-    querySnapshot.forEach((doc) =>{
-      doc.forEach(element => {
-        element.children.forEach(child => {
-          if(child === childId){
-            return element.uid;
+  db.collection("users")
+    .get()
+    .then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        // console.log("inside 1st loop", doc.data());
+        doc.data().children.forEach((child) => {
+          if (child === childId) {
+            // console.log("func to check pid", child);
+            // console.log(doc.id);
+            return doc.id;
           }
         });
       });
-    })
-  })
+    });
+};
 
-  
 
-}
 
 //Updating Document in FB Firestore
 export const updateUserData = (

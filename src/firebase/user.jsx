@@ -1,6 +1,7 @@
 import fire from "./fire";
 import axios from "axios";
 import firebase1 from 'firebase/app'
+import { data } from "jquery";
 const firebase = fire;
 
 
@@ -131,8 +132,30 @@ export const getAllUser = async() => {
   const db = fire.firestore();
   let allUsers = await db.collection("users").get()
  allUsers = allUsers.docs.map(i => {return i.data()})
-
 };
+// const d1 = await getAllUser();
+// console.log("===="+d1)
+// getAllUser().then((data)=>{
+//   console.log("===="+data)
+// })
+
+export const getParentByChildId = async(childId) =>{
+  const db = fire.firestore();
+  db.collection("user").get().then((querySnapshot) => {
+    querySnapshot.forEach((doc) =>{
+      doc.forEach(element => {
+        element.children.forEach(child => {
+          if(child === childId){
+            return element.uid;
+          }
+        });
+      });
+    })
+  })
+
+  
+
+}
 
 //Updating Document in FB Firestore
 export const updateUserData = (

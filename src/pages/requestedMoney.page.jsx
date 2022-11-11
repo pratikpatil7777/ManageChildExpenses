@@ -2,59 +2,55 @@ import React, { Fragment, useEffect, useState } from "react";
 import Spinner from "react-bootstrap/Spinner";
 import { Link, useLocation } from "react-router-dom";
 import { getVasooliByFilter } from "./../firebase/vasooli";
-import fire from "./../firebase/fire";
+// import fire from "./../firebase/fire";
 import Vasoolicard from "./../components/allocateMoney/vasoolicard";
 import Empty from "./../components/general/empty.component";
 import Form from "react-bootstrap/Form";
-
+import fire from "../firebase/fire";
+import { getUserData } from "../firebase/user";
 export default function RequestedMoneyV() {
   const [filter, setfilter] = useState("ALL");
   const [SendToCardFilter, setSendToCardFilter] = useState("ALL");
   const [VasooliArr, setVasooliArr] = useState([]);
   const [loading, setloading] = useState(true);
-  const [user, setuser] = useState({});
+  // const [user, setuser] = useState({});
+
   let loc = useLocation();
   const getDataFromFB = () => {
-    let email = user.email;
     setloading(true);
-
-    // setSendToCardFilter(filter);
-    // getVasooliByFilter(
-    //   email,
-    //   filter,
-    //   (res) => {
-    //     let Arr = [];
-    //     res.forEach((item) => {
-    //       Arr.push({ ...item.data(), ["id"]: item.id });
-    //     });
-    //     console.log(Arr);
-    //     setVasooliArr(Arr);
-    //     setloading(false);
-    //   },
-    //   (err) => console.log(err)
-    // );
+    let user = fire.auth().currentUser;
+    // console.log(user.uid);
+    let userData = getUserData(
+      user.uid,
+      (s) => {
+        console.log(s);
+      },
+      (err) => {
+        console.log(err);
+      }
+    );
   };
 
-  useEffect(() => {
-    setloading(true);
-    fire.auth().onAuthStateChanged(function (user) {
-      if (user) {
-        setuser(user);
-        getVasooliByFilter(
-          user.email,
-          "ALL",
-          (res) => {
-            //console.log(res);
-            setVasooliArr(res);
-            setloading(false);
-          },
-          (err) => console.log(err)
-        );
-      } else {
-        //console.log("NO user AUth Change");
-      }
-    });
-  }, [loc.pathname]);
+  // useEffect(() => {
+  //   setloading(true);
+  //   fire.auth().onAuthStateChanged(function (user) {
+  //     if (user) {
+  //       setuser(user);
+  //       getVasooliByFilter(
+  //         user.email,
+  //         "ALL",
+  //         (res) => {
+  //           console.log(res);
+  //           setVasooliArr(res);
+  //           setloading(false);
+  //         },
+  //         (err) => console.log(err)
+  //       );
+  //     } else {
+  //       console.log("NO user AUth Change");
+  //     }
+  //   });
+  // }, [loc.pathname]);
   return (
     <Fragment>
       <div className="row" style={{ marginBottom: "7px" }}>

@@ -66,27 +66,6 @@ export default function TransactionsV() {
 
   return (
     <Fragment>
-      <div className='row' style={{ marginBottom: "7px" }}>
-        <div className='col-6 col-sm-6 col-md-6'>
-          <select
-            className='custom-select w-100'
-            value={filter}
-            onChange={(e) => setfilter(e.target.value)}>
-            <option value='ALL'>All</option>
-            <option value='INC'>Income</option>
-            <option value='EXP'>Expenses</option>
-          </select>
-        </div>
-        <div className='col-6 col-sm-6 col-md-6 d-flex flex-row'>
-          <button className='btn btn-outline-info mx-1' onClick={getDataFromFB}>
-            Apply
-          </button>
-          <Link to='/addtransaction' className='btn btn-success mx-1'>
-            New
-            <i className='fa fa-plus mx-1'></i>
-          </Link>
-        </div>
-      </div>
       {!loading ? (
         TransactionsArr.length > 0 ? (
           TransactionsArr.map((trans, index) => (
@@ -96,12 +75,13 @@ export default function TransactionsV() {
           <Empty />
         )
       ) : (
-        <div className='w-100 d-flex justify-content-center'>
+        <div className="w-100 d-flex justify-content-center">
           <Spinner
-            animation='border'
-            role='status'
-            style={{ width: "70px", height: "70px", margin: "auto" }}>
-            <span className='sr-only'>Loading...</span>
+            animation="border"
+            role="status"
+            style={{ width: "70px", height: "70px", margin: "auto" }}
+          >
+            <span className="sr-only">Loading...</span>
           </Spinner>
         </div>
       )}

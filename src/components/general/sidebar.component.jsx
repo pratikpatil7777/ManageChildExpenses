@@ -8,6 +8,7 @@ const IconStyling = {
   fontSize: "25px",
   margin: "0 5px",
 };
+
 export default function SidebarV({ control, cleanuser, user, loggedin, dp }) {
   const [select, setSelect] = useState("");
   const logout = () => {
@@ -179,11 +180,9 @@ export default function SidebarV({ control, cleanuser, user, loggedin, dp }) {
                       textShadow:
                         "0 0 20px #ae4825,0 0 80px #ae4825, 0 0 90px #ae4825, 0 0 100px #ae4825,   0 0 150px #ae4825",
                     }}
-                  >
-                    Money Request
-                  </strong>
+                  ></strong>
                 ) : (
-                  <strong>Money Request</strong>
+                  <strong>Request Money</strong>
                 )}
               </Link>
               <Link

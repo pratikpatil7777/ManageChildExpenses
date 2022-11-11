@@ -167,16 +167,13 @@ export default function DashboardV() {
               }}
               startDelay={2000}
               cursorColor="#3F3D56"
-              multiText={[
-                "Welcome back, _______ !!!",
-                "You are a _______ User",
-              ]}
+              multiText={["Welcome back, asd !!!", "You are a parent User"]}
               multiTextLoop={true}
               multiTextDelay={1000}
               typeSpeed={30}
             />
 
-            {/* <h3>Your Wallet Balance is $900</h3> */}
+            <h3>Your Wallet Balance is $900</h3>
 
             {/* <h2>John Doe</h2>
             <h3>Web Designer</h3>

@@ -3,7 +3,7 @@ import Spinner from "react-bootstrap/Spinner";
 import { Link, useLocation } from "react-router-dom";
 import { getVasooliByFilter } from "./../firebase/vasooli";
 import fire from "./../firebase/fire";
-import Vasoolicard from "./../components/vasooli/vasoolicard";
+import Vasoolicard from "./../components/allocateMoney/vasoolicard";
 import Empty from "./../components/general/empty.component";
 
 export default function RequestedMoneyV() {

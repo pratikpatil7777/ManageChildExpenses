@@ -33,7 +33,7 @@ export default function DashboardV() {
     getUserData(
       user?.uid,
       (s) => {
-        let userD = s.userData;
+        let userD = s;
         setUserObj(userD);
         if (userD.children.length) {
           setUserType("Parent");

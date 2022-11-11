@@ -25,7 +25,7 @@ export default function VasooliV() {
     getUserData(
       user?.uid,
       (s) => {
-        let userD = s.userData;
+        let userD = s;
         setUserObj(userD);
         if (userD.children.length) {
           setIsParent(true);

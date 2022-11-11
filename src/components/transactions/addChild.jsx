@@ -1,7 +1,10 @@
 import React, { useState, useEffect, Fragment } from "react";
 // import { FBsignup } from "./../firebase/user";
+import fire from "../../firebase/fire";
 import { createChild } from "../../firebase/user";
 import { Link } from "react-router-dom";
+import { firestore } from "firebase";
+
 export default function AddChild({ setdp }) {
   const [user, setuser] = useState({
     email: "",
@@ -15,7 +18,7 @@ export default function AddChild({ setdp }) {
 
   const handleChange = (e) => {
     setuser({ ...user, [e.target.name]: e.target.value });
-    //console.log(user);
+    console.log(user);
   };
   const sucessAlert = () => (
     <div className="alert alert-success">
@@ -47,7 +50,7 @@ export default function AddChild({ setdp }) {
       }, 3000);
     }
   }, [success]);
-
+  const firebase = fire;
   const onSubmit = () => {
     if (user.pass1 !== user.pass2) {
       seterrorbody({
@@ -58,10 +61,11 @@ export default function AddChild({ setdp }) {
       let dp = Math.floor(Math.random() * 9);
       createChild(
         {
-          randomProfile: dp,
+          // randomProfile: dp,
           email: user.email,
           password: user.pass1,
           fullName: user.fullName,
+          parentId : firebase.auth().currentUser.uid
         },
         (user, dp) => {
           setsuccess(true);

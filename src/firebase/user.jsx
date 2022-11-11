@@ -1,6 +1,9 @@
 import fire from "./fire";
 import axios from "axios";
+import firebase1 from 'firebase/app'
 const firebase = fire;
+
+
 
 //Function to Login the Exsiting user
 export const FBlogin = ({ email, password }, successFn, errorFn) => {
@@ -57,7 +60,7 @@ export const FBsignup = (
       // Pushing to Firestore
       db.collection("users")
         .doc(user.uid)
-        .set({userData})
+        .set(userData)
         .then(() => {
           console.log("Pushed to Firestore");
         })
@@ -72,41 +75,36 @@ export const FBsignup = (
 //func to create a child for logged parent
 //func need some changes, after child is created, the child gets logged in.
 export const createChild = (
-  { email, password, fullName },
+  { email, password, fullName, parentId },
   successFn,
   errorFn
 ) => {
-  const userData = {
-    name: fullName,
-    email: email,
-    children: [],
-    wallet: 0,
-  };
   //Random Number Gen Logic between 1 to 9 for DP
   const db = fire.firestore();
   //Firebase Authentication Signup
   firebase
     .auth()
     .createUserWithEmailAndPassword(email, password)
-    .then((childCred) => {
-      console.log("childCred", childCred);
-       let child = childCred.user
-      // user
-      //   // .updateProfile({
-      //   //   photoURL: randomProfile.toString(),
-      //   // })
-      //   .then(() => {
-      //     successFn(firebase.auth().currentUser, userData);
-      //   })
-      //   .catch(() => {
-      //     console.log("Error Updating Profile Pic");
-      //   });
-      // Pushing to Firestore
+    .then(() => {
       db.collection("users")
-        .doc(child.uid)
-        .set({userData})
+        .doc(parentId)
+        .update({children: firebase1.firestore.FieldValue.arrayUnion(firebase.auth().currentUser.uid)})
         .then(() => {
-          console.log("Pushed to Firestore");
+          //add child to the collection.
+          const childData = {
+            name: fullName,
+            email: email,
+            children: [],
+            wallet: 0,
+          };
+
+          db.collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .set(childData)
+          .then(() => {
+            console.log("Pushed to Firestore");
+          })
+        .catch((er) => console.log(er));
         })
         .catch((er) => console.log(er));
     })

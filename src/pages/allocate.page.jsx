@@ -1,84 +1,90 @@
 import React, { Fragment, useEffect, useState } from "react";
 import Spinner from "react-bootstrap/Spinner";
 import { Link, useLocation } from "react-router-dom";
-import { getVasooliByFilter } from "../firebase/vasooli";
+import { getVasooliByFilter } from "./../firebase/vasooli";
+// import fire from "./../firebase/fire";
+import Vasoolicard from "./../components/allocateMoney/vasoolicard";
+import Empty from "./../components/general/empty.component";
+import Form from "react-bootstrap/Form";
 import fire from "../firebase/fire";
-import Vasoolicard from "../components/allocateMoney/vasoolicard";
-import Empty from "../components/general/empty.component";
+import { getUserData } from "../firebase/user";
 export default function VasooliV() {
   const [filter, setfilter] = useState("ALL");
   const [SendToCardFilter, setSendToCardFilter] = useState("ALL");
   const [VasooliArr, setVasooliArr] = useState([]);
   const [loading, setloading] = useState(true);
-  const [user, setuser] = useState({});
+  // const [user, setuser] = useState({});
+  const [userObj, setUserObj] = useState({});
+  const [isParent, setIsParent] = useState(false);
+
   let loc = useLocation();
+
   const getDataFromFB = () => {
-    let email = user.email;
     setloading(true);
-    setSendToCardFilter(filter);
-    getVasooliByFilter(
-      email,
-      filter,
-      (res) => {
-        let Arr = [];
-        res.forEach((item) => {
-          //console.log(item);
-          Arr.push({ ...item.data(), ["id"]: item.id });
-        });
-        console.log(Arr);
-        setVasooliArr(Arr);
-        setloading(false);
+    let user = fire.auth().currentUser;
+    getUserData(
+      user?.uid,
+      (s) => {
+        let userD = s.userData;
+        setUserObj(userD);
+        if (userD.children.length) {
+          setIsParent(true);
+        } else {
+          setIsParent(false);
+        }
       },
-      (err) => console.log(err)
+      (err) => {
+        console.log(err);
+      }
     );
   };
 
   useEffect(() => {
-    setloading(true);
-    fire.auth().onAuthStateChanged(function (user) {
-      if (user) {
-        setuser(user);
-        getVasooliByFilter(
-          user.email,
-          "ALL",
-          (res) => {
-            //console.log(res);
-            setVasooliArr(res);
-            setloading(false);
-          },
-          (err) => console.log(err)
-        );
-      } else {
-        //console.log("NO user AUth Change");
-      }
-    });
-  }, [loc.pathname]);
+    getDataFromFB();
+  }, []);
+
+  // console.log("allo------", isParent, userObj);
+
   return (
     <Fragment>
       <div className="row" style={{ marginBottom: "7px" }}>
         <div className="col-6 col-sm-6 col-md-6">
-          <select
+          <Form.Select
+            className="custom-select w-100"
+            value={filter}
+            // onChange={(e) => setfilter(e.target.value)}
+            aria-label="Default select example"
+          >
+            {userObj.children?.map((ch, idx) => (
+              <option value={ch} key={idx}>
+                {ch}
+              </option>
+            ))}
+          </Form.Select>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Amount"
+          ></input>
+          <Form.Select
             className="custom-select w-100"
             value={filter}
             onChange={(e) => setfilter(e.target.value)}
+            aria-label="Default select example"
           >
-            {/* Here list down all the children and  */}
-            {/* <option value="ALL">All</option>
-            <option value="PAY">Pay your Debt</option>
-            <option value="ASK">Ask for Vasooli</option> */}
-          </select>
-        </div>
-        <div className="col-6 col-sm-6 col-md-6 d-flex flex-row">
-          <button className="btn btn-outline-info mx-1" onClick={getDataFromFB}>
-            Apply
-          </button>
-          <Link to="/newAllocate" className="btn btn-success mx-1">
-            New
-            <i className="fa fa-plus mx-1"></i>
-          </Link>
+            <option value="">Select an Option</option>
+            <option value="Food">Food</option>
+            <option value="Fees">Fees</option>
+            <option value="Commute">Commute</option>
+            <option value="Stationary">Stationary</option>
+            <option value="Medicine">Medicine</option>
+            <option value="Bill">Bill</option>
+            <option value="Other">Other</option>
+          </Form.Select>
+          <button className="btn btn-outline-info mx-1">submit</button>
         </div>
       </div>
-      {!loading ? (
+      {/* {!loading ? (
         VasooliArr.length > 0 ? (
           VasooliArr.map((single, index) => (
             <Vasoolicard key={index} data={single} filter={SendToCardFilter} />
@@ -96,7 +102,7 @@ export default function VasooliV() {
             <span className="sr-only">Loading...</span>
           </Spinner>
         </div>
-      )}
+      )} */}
     </Fragment>
   );
 }

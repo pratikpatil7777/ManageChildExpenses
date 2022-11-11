@@ -10,19 +10,48 @@ import Empty from "./../components/general/empty.component";
 import "./dashboard.style.css";
 import TypeWriterEffect from "react-typewriter-effect";
 import MyParticles from "./particles";
-import {getAllUser} from "../firebase/user"
+import { getAllUser, getUserData } from "../firebase/user";
+
 export default function DashboardV() {
+  const [allUser, setAllUser] = useState([]);
+  const [userObj, setUserObj] = useState({});
+  const [userType, setUserType] = useState("");
+  const [loading, setloading] = useState(true);
 
-  const [allUser, setAllUser] = useState([])
+  // useEffect(()=> {
+  //   const res = getAllUser()
+  //   if(res.data !== undefined){
+  //     console.log(res)
+  //     setAllUser(res.data)
+  //   }
 
-  useEffect(()=> {
-    const res = getAllUser()
-    if(res.data !== undefined){
-      console.log(res)
-      setAllUser(res.data)
-    }
-    
-  },[])
+  // },[])
+
+  const getDataFromFB = () => {
+    setloading(true);
+    let user = fire.auth().currentUser;
+    getUserData(
+      user?.uid,
+      (s) => {
+        let userD = s.userData;
+        setUserObj(userD);
+        if (userD.children.length) {
+          setUserType("Parent");
+        } else {
+          setUserType("Child");
+        }
+      },
+      (err) => {
+        console.log(err);
+      }
+    );
+  };
+
+  useEffect(() => {
+    getDataFromFB();
+  }, []);
+
+  console.log("dashhhhh------", userType, userObj);
 
   // console.log("-------------"+allUser)
   // const [TransactionsArr, setTransactionsArr] = useState([]);
@@ -181,13 +210,16 @@ export default function DashboardV() {
               }}
               startDelay={2000}
               cursorColor="#3F3D56"
-              multiText={["Welcome back, asd !!!", "You are a parent User"]}
+              multiText={[
+                `Welcome back, ${userObj.name} !!!`,
+                `You are a ${userType} User`,
+              ]}
               multiTextLoop={true}
               multiTextDelay={1000}
               typeSpeed={30}
             />
 
-            <h3>Your Wallet Balance is $900</h3>
+            <h3>Your Wallet Balance is {userObj.wallet}</h3>
 
             {/* <h2>John Doe</h2>
             <h3>Web Designer</h3>

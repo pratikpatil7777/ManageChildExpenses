@@ -8,8 +8,8 @@ export default function ProfileV() {
   const [user, setuser] = useState({
     email: "",
     fullName: "",
-    profilePic: "",
-    address: "",
+    // profilePic: "",
+    // address: "",
   });
   const [intialdata, setintialdata] = useState({});
   const [uid, setuid] = useState("");

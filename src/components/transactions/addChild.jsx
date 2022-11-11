@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Fragment } from "react";
 // import { FBsignup } from "./../firebase/user";
-import { FBsignup } from "../../firebase/user";
+import { createChild } from "../../firebase/user";
 import { Link } from "react-router-dom";
 export default function AddChild({ setdp }) {
   const [user, setuser] = useState({
@@ -56,7 +56,7 @@ export default function AddChild({ setdp }) {
       seterror(true);
     } else {
       let dp = Math.floor(Math.random() * 9);
-      FBsignup(
+      createChild(
         {
           randomProfile: dp,
           email: user.email,

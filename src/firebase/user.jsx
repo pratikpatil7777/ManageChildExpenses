@@ -69,6 +69,53 @@ export const FBsignup = (
     });
 };
 
+//func to create a child for logged parent
+//func need some changes, after child is created, the child gets logged in.
+export const createChild = (
+  { email, password, fullName },
+  successFn,
+  errorFn
+) => {
+  const userData = {
+    name: fullName,
+    email: email,
+    children: [],
+    wallet: 0,
+  };
+  //Random Number Gen Logic between 1 to 9 for DP
+  const db = fire.firestore();
+  //Firebase Authentication Signup
+  firebase
+    .auth()
+    .createUserWithEmailAndPassword(email, password)
+    .then((childCred) => {
+      console.log("childCred", childCred);
+       let child = childCred.user
+      // user
+      //   // .updateProfile({
+      //   //   photoURL: randomProfile.toString(),
+      //   // })
+      //   .then(() => {
+      //     successFn(firebase.auth().currentUser, userData);
+      //   })
+      //   .catch(() => {
+      //     console.log("Error Updating Profile Pic");
+      //   });
+      // Pushing to Firestore
+      db.collection("users")
+        .doc(child.uid)
+        .set({userData})
+        .then(() => {
+          console.log("Pushed to Firestore");
+        })
+        .catch((er) => console.log(er));
+    })
+    .catch(function (error) {
+      console.log(error);
+      errorFn(error);
+    });
+};
+
 //Function to get all user data
 export const getUserData = (uid, successFn, errorFn) => {
   const db = fire.firestore();

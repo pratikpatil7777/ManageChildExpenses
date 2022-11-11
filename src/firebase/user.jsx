@@ -141,23 +141,15 @@ export const getAllUser = async() => {
 
 export const getParentByChildId = async (childId) => {
   const db = fire.firestore();
-  db.collection("users")
-    .get()
-    .then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        // console.log("inside 1st loop", doc.data());
-        doc.data().children.forEach((child) => {
-          if (child === childId) {
-            // console.log("func to check pid", child);
-            // console.log(doc.id);
-            return doc.id;
-          }
-        });
-      });
-    });
+  let pid = await db.collection("users").get()
+  let userMap = {}
+  pid.docs.map( i => {userMap[i.id] = i.data().children })
+  let childIDs = []
+  Object.keys(userMap).forEach(k => {
+    if(userMap[k].includes(childId)) childIDs.push(k)
+  })
+  return childIDs
 };
-
-
 
 //Updating Document in FB Firestore
 export const updateUserData = (

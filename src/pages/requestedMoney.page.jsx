@@ -9,6 +9,7 @@ import Form from "react-bootstrap/Form";
 import fire from "../firebase/fire";
 import { getUserData, getParentByChildId } from "../firebase/user";
 import { requestMoney } from "./../firebase/vasooli";
+import { data } from "jquery";
 export default function RequestedMoneyV() {
   const [filter, setfilter] = useState("ALL");
   const [SendToCardFilter, setSendToCardFilter] = useState("ALL");
@@ -44,36 +45,19 @@ export default function RequestedMoneyV() {
     getDataFromFB();
   }, []);
 
-  // const handleGetParentId = (id)=> {
-  //   const
-  // }
-  // useEffect(() => {
-  //   if (isParent === true) return;
-  //   if (isParent === false) {
-  //     let u1 = fire.auth().currentUser;
-  //     const getID = async (id) => {
-  //       await getParentByChildId(id).then((data) => {
-  //         console.log("iiiiiisdddddd", data);
-  //         setParentID(data);
-  //       });
-  //     };
-  //     getID(u1.uid);
-  //     // await getParentByChildId(u1.uid).then((pID) => {
-  //     //   console.log("ppppiiiidddd", pID);
-  //     //   setParentID(pID);
-  //     // });
-  //   }
-  // }, []);
+  useEffect(() => {
+    async function getParent() {
+      let user = fire.auth().currentUser;
+      let pd = await getParentByChildId(user.uid);
+      console.log("pd:--------- "+pd);
+    }
+    getParent();
+  },[])
 
-  let u1 = fire.auth().currentUser;
-  const idid = async () => {
-    await getParentByChildId(u1.uid).then((data) => {
-      console.log("====== " + data);
-    });
-  };
-  idid();
-
-  // console.log("pID------", parentID);
+  // let user = fire.auth().currentUser;
+  // console.log("============ "+(user.uid));
+  // let pd = getParentByChildId(user.uid);
+  // console.log("pd:--------- "+pd);
 
   return (
     <Fragment>

@@ -10,7 +10,21 @@ import Empty from "./../components/general/empty.component";
 import "./dashboard.style.css";
 import TypeWriterEffect from "react-typewriter-effect";
 import MyParticles from "./particles";
+import {getAllUser} from "../firebase/user"
 export default function DashboardV() {
+
+  const [allUser, setAllUser] = useState([])
+
+  useEffect(()=> {
+    const res = getAllUser()
+    if(res.data !== undefined){
+      console.log(res)
+      setAllUser(res.data)
+    }
+    
+  },[])
+
+  // console.log("-------------"+allUser)
   // const [TransactionsArr, setTransactionsArr] = useState([]);
   // const [IncomePieData, setIncomePieData] = useState([]);
   // const [ExpensePieData, seExpensePieData] = useState([]);

@@ -1,4 +1,5 @@
 import fire from "./fire";
+const { v4 } = require("uuid");
 
 //Add new transaction
 export const Newtransaction = (
@@ -21,6 +22,42 @@ export const Newtransaction = (
     .add(obj)
     .then((res) => successFn(res))
     .catch((err) => errorFn(err));
+};
+
+export const requestMoney = (
+  { receiver_id, amount, category },
+  successFn,
+  errorFn
+) => {
+  let user = fire.auth().currentUser;
+  let transactionData = {
+    id: v4(),
+    sender_id: user.uid,
+    receiver_id: receiver_id,
+    amount: amount,
+    timestamp: new Date(),
+    state: "Pending",
+    category: category,
+  };
+  const db = fire.firestore();
+  db.collection("transactions")
+    .add(transactionData)
+    .then((res) => successFn(res))
+    .catch((err) => errorFn(err));
+};
+
+export const allocateMoney = async (childrenIds, amount, category) => {
+  const db = fire.firestore();
+  console.log(fire,"-=-=-=-=-=-=-=-=-=-=");
+  let user = fire.auth().currentUser; 
+  user = "FznmidkiCVNOMWuqmZn42JrNrVt1";
+  console.log(user,"-0-0-0-0-0-0-0-0-0-0-");
+  const currUser = await db.collection("users")
+  .doc(user)
+  .get();
+
+  console.log(currUser,"-------------------==============-=-=-==-=-=-=-=-=-=-=-=-");
+
 };
 
 //Get Vasooli's by Filter

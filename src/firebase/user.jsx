@@ -25,10 +25,16 @@ export const FBlogout = (successFn, errorFn) => {
 
 //Function to Create New User
 export const FBsignup = (
-  { randomProfile, email, password, fullName },
+  { email, password, fullName },
   successFn,
   errorFn
 ) => {
+  const userData = {
+    name: fullName,
+    email: email,
+    children: [],
+    wallet: 0,
+  };
   //Random Number Gen Logic between 1 to 9 for DP
   const db = fire.firestore();
   //Firebase Authentication Signup
@@ -37,27 +43,21 @@ export const FBsignup = (
     .createUserWithEmailAndPassword(email, password)
     .then(() => {
       console.log("user created");
-      let user = firebase.auth().currentUser;
-      user
-        .updateProfile({
-          photoURL: randomProfile.toString(),
-        })
-        .then(() => {
-          successFn(firebase.auth().currentUser, randomProfile);
-        })
-        .catch(() => {
-          console.log("Error Updating Profile Pic");
-        });
+       let user = firebase.auth().currentUser;
+      // user
+      //   // .updateProfile({
+      //   //   photoURL: randomProfile.toString(),
+      //   // })
+      //   .then(() => {
+      //     successFn(firebase.auth().currentUser, userData);
+      //   })
+      //   .catch(() => {
+      //     console.log("Error Updating Profile Pic");
+      //   });
       // Pushing to Firestore
       db.collection("users")
         .doc(user.uid)
-        .set({
-          fullName,
-          address: "",
-          balance: 0,
-          email: user.email,
-          profilePic: randomProfile.toString(),
-        })
+        .set({userData})
         .then(() => {
           console.log("Pushed to Firestore");
         })
@@ -79,6 +79,14 @@ export const getUserData = (uid, successFn, errorFn) => {
       successFn(res.data());
     })
     .catch((err) => errorFn(err));
+};
+
+//getAllUsers
+export const getAllUser = async() => {
+  const db = fire.firestore();
+  let allUsers = await db.collection("users").get()
+ allUsers = allUsers.docs.map(i => {return i.data()})
+
 };
 
 //Updating Document in FB Firestore

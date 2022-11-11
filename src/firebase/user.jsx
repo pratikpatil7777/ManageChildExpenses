@@ -141,14 +141,16 @@ export const getAllUser = async() => {
 
 export const getParentByChildId = async (childId) => {
   const db = fire.firestore();
-  let pid = await db.collection("users").get()
-  let userMap = {}
-  pid.docs.map( i => {userMap[i.id] = i.data().children })
-  let childIDs = []
-  Object.keys(userMap).forEach(k => {
-    if(userMap[k].includes(childId)) childIDs.push(k)
-  })
-  return childIDs
+  let ans = await db.collection("users")
+    .get()
+    let child;
+    ans.docs.forEach(i => {
+      i.data().children.forEach(c => {
+        if(c === childId) return child = i.id
+      })
+    })
+
+    return child;
 };
 
 //Updating Document in FB Firestore

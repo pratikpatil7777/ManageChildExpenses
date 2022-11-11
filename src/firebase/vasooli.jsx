@@ -31,7 +31,6 @@ export const requestMoney = (
 ) => {
   let user = fire.auth().currentUser;
   let transactionData = {
-    id: v4(),
     sender_id: user.uid,
     receiver_id: receiver_id,
     amount: amount,

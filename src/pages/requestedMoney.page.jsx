@@ -19,6 +19,11 @@ export default function RequestedMoneyV() {
   const [userObj, setUserObj] = useState({});
   const [isParent, setIsParent] = useState(false);
   const [parentID, setParentID] = useState("");
+  const [reqM, setReqM] = useState({
+    receiver_id: "",
+    amount: "",
+    category: "",
+  });
 
   let loc = useLocation();
   const getDataFromFB = () => {
@@ -49,15 +54,34 @@ export default function RequestedMoneyV() {
     async function getParent() {
       let user = fire.auth().currentUser;
       let pd = await getParentByChildId(user.uid);
-      console.log("pd:--------- "+pd);
+      // console.log("pd:--------- "+pd);
+      setParentID(pd);
+      setReqM((prev) => {
+        return {
+          ...prev,
+          receiver_id: pd,
+        };
+      });
     }
     getParent();
-  },[])
+  }, []);
 
   // let user = fire.auth().currentUser;
   // console.log("============ "+(user.uid));
   // let pd = getParentByChildId(user.uid);
   // console.log("pd:--------- "+pd);
+
+  const handleReqM = (e) => {
+    const { name, value } = e.target;
+    setReqM((prev) => {
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
+  };
+
+  console.log(reqM);
 
   return (
     <Fragment>
@@ -70,14 +94,18 @@ export default function RequestedMoneyV() {
               placeholder="Please enter receiver ID"
             ></input> */}
             <input
-              type="text"
+              type="number"
+              name="amount"
               className="form-control"
               placeholder="Amount"
+              onChange={handleReqM}
             ></input>
             <Form.Select
               className="custom-select w-100"
-              value={filter}
-              onChange={(e) => setfilter(e.target.value)}
+              // value={filter}
+              // onChange={(e) => setfilter(e.target.value)}
+              name="category"
+              onChange={handleReqM}
               aria-label="Default select example"
             >
               <option value="">Select an Option</option>
@@ -91,7 +119,18 @@ export default function RequestedMoneyV() {
             </Form.Select>
             <button
               className="btn btn-outline-info mx-1"
-              onClick={getDataFromFB}
+              // onClick={getDataFromFB}
+              onClick={() => {
+                requestMoney(
+                  reqM,
+                  (s) => {
+                    console.log("req success");
+                  },
+                  (e) => {
+                    console.log("req failed");
+                  }
+                );
+              }}
             >
               submit
             </button>

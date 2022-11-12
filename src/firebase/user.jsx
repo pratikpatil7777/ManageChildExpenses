@@ -197,7 +197,7 @@ export const getTransactionsById = async (pId) => {
   data.docs.forEach((i) => {
     console.log("data:--------- " + pId);
     if (i.data().receiver_id === pId && i.data().state === "Pending") {
-      res.push(i.data());
+      res.push({...i.data(), id: i.id});
     }
   });
   // console.log("res", res);

@@ -7,9 +7,14 @@ import Vasoolicard from "./../components/allocateMoney/vasoolicard";
 import Empty from "./../components/general/empty.component";
 import Form from "react-bootstrap/Form";
 import fire from "../firebase/fire";
-import { getUserData, getParentByChildId } from "../firebase/user";
+import {
+  getUserData,
+  getParentByChildId,
+  getTransactionsById,
+} from "../firebase/user";
 import { requestMoney } from "./../firebase/vasooli";
 import { data } from "jquery";
+import { Table } from "react-bootstrap";
 export default function RequestedMoneyV() {
   const [filter, setfilter] = useState("ALL");
   const [SendToCardFilter, setSendToCardFilter] = useState("ALL");
@@ -24,18 +29,57 @@ export default function RequestedMoneyV() {
     amount: "",
     category: "",
   });
+  // const [names, setName] = useState([]);
+  // const [amounts, setAmounts] = useState([]);
+  const [allReqArr, setAllReqArr] = useState([]);
 
   let loc = useLocation();
   const getDataFromFB = () => {
     setloading(true);
     let user = fire.auth().currentUser;
+    const res = [];
+    const transactions = [];
+    const amt = [];
     getUserData(
       user?.uid,
-      (s) => {
+      async (s) => {
         let userD = s;
         setUserObj(userD);
         if (userD.children.length) {
           setIsParent(true);
+          let allReq = await getTransactionsById(user.uid);
+          // console.log("all reqqqqqqq", allReq);
+          let senderIds = allReq.map((i) => {
+            return i.sender_id;
+          });
+
+          // allReq.forEach((ele, idx) => {
+          //   // console.log("senderids", ele.sender_id);
+          //   getUserData(
+          //     ele.sender_id,
+          //     (chData) => {
+          //       allReq[idx]["childName"] = chData.name;
+          //       // console.log("Namessssss", chData.name);
+          //       // transactions.push(ele.state);
+          //       // res.push(chData.name);
+          //       // amt.push(ele.amount);
+          //     },
+          //     (err) => {
+          //       console.log(err);
+          //     }
+          //   );
+          // });
+
+          setAllReqArr(allReq);
+          // setName(res);
+          // setAmounts(amt);
+          // console.log(
+          //   amt,
+          //   "===============",
+          //   transactions,
+          //   "============",
+          //   res
+          // );
         } else {
           setIsParent(false);
         }
@@ -49,6 +93,17 @@ export default function RequestedMoneyV() {
   useEffect(() => {
     getDataFromFB();
   }, []);
+
+  // useEffect(() => {
+  //   if (isParent === true) {
+  //     let allReq = getTransactionsById(userObj.uid);
+  //     console.log("all reqqqqqqq", allReq);
+  //   }
+  // });
+
+  useEffect(() => {
+    console.log("all reqqqqqqq", allReqArr);
+  }, [allReqArr]);
 
   useEffect(() => {
     async function getParent() {
@@ -81,8 +136,8 @@ export default function RequestedMoneyV() {
     });
   };
 
-  console.log(reqM);
-
+  // console.log(reqM);
+  // console.log("all reqqqqqqq", allReqArr);
   return (
     <Fragment>
       <div className="row" style={{ marginBottom: "7px" }}>
@@ -136,7 +191,31 @@ export default function RequestedMoneyV() {
             </button>
           </div>
         ) : (
-          <div>you are a parent</div>
+          <>
+            <div>you are a parent</div>
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>Child Name</th>
+                  <th>Amount</th>
+                  <th>Accept/Deny</th>
+                </tr>
+              </thead>
+              {allReqArr && allReqArr.length > 0 ? (
+                <tbody>
+                  {allReqArr.map((reqq) => (
+                    <tr key={reqq.sender_id}>
+                      <td>{reqq.childName}</td>
+                      <td>{reqq.amount}</td>
+                      <td>{reqq.state}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              ) : (
+                <tbody></tbody>
+              )}
+            </Table>
+          </>
         )}
       </div>
       {/* {!loading ? (

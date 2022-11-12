@@ -28,11 +28,7 @@ export const FBlogout = (successFn, errorFn) => {
 };
 
 //Function to Create New User
-export const FBsignup = (
-  { email, password, fullName },
-  successFn,
-  errorFn
-) => {
+export const FBsignup = ({ email, password, fullName }, successFn, errorFn) => {
   const userData = {
     name: fullName,
     email: email,
@@ -47,7 +43,7 @@ export const FBsignup = (
     .createUserWithEmailAndPassword(email, password)
     .then(() => {
       console.log("user created");
-       let user = firebase.auth().currentUser;
+      let user = firebase.auth().currentUser;
       // user
       //   // .updateProfile({
       //   //   photoURL: randomProfile.toString(),
@@ -61,7 +57,7 @@ export const FBsignup = (
       // Pushing to Firestore
       db.collection("users")
         .doc(user.uid)
-        .set(userData)
+        .set({ id: user.uid, userData })
         .then(() => {
           console.log("Pushed to Firestore");
         })
@@ -89,7 +85,11 @@ export const createChild = (
     .then(() => {
       db.collection("users")
         .doc(parentId)
-        .update({children: firebase1.firestore.FieldValue.arrayUnion(firebase.auth().currentUser.uid)})
+        .update({
+          children: firebase1.firestore.FieldValue.arrayUnion(
+            firebase.auth().currentUser.uid
+          ),
+        })
         .then(() => {
           //add child to the collection.
           const childData = {
@@ -100,12 +100,12 @@ export const createChild = (
           };
 
           db.collection("users")
-          .doc(firebase.auth().currentUser.uid)
-          .set(childData)
-          .then(() => {
-            console.log("Pushed to Firestore");
-          })
-        .catch((er) => console.log(er));
+            .doc(firebase.auth().currentUser.uid)
+            .set(childData)
+            .then(() => {
+              console.log("Pushed to Firestore");
+            })
+            .catch((er) => console.log(er));
         })
         .catch((er) => console.log(er));
     })
@@ -127,11 +127,27 @@ export const getUserData = (uid, successFn, errorFn) => {
     .catch((err) => errorFn(err));
 };
 
-//getAllUsers
-export const getAllUser = async() => {
+export const getSpecificUsers = (userIDs, successFn, errorFn) => {
   const db = fire.firestore();
-  let allUsers = await db.collection("users").get()
- allUsers = allUsers.docs.map(i => {return i.data()})
+  db.collection("users")
+    .where("id", "in", userIDs)
+    .get()
+    .then((res) => {
+      const data = res.docs.map((i) => {
+        return i.data();
+      });
+      successFn(data);
+    })
+    .catch((err) => errorFn(err));
+};
+
+//getAllUsers
+export const getAllUser = async () => {
+  const db = fire.firestore();
+  let allUsers = await db.collection("users").get();
+  allUsers = allUsers.docs.map((i) => {
+    return i.data();
+  });
 };
 // const d1 = await getAllUser();
 // console.log("===="+d1)
@@ -141,32 +157,31 @@ export const getAllUser = async() => {
 
 export const getParentByChildId = async (childId) => {
   const db = fire.firestore();
-  let data1 = await db.collection("users")
-    .get()
-    let child;
-    data1.docs.forEach(i => {
-      i.data().children.forEach(c => {
-        if(c === childId) return child = i.id
-      })
-    })
+  let data1 = await db.collection("users").get();
+  let child;
+  data1.docs.forEach((i) => {
+    i.data().children.forEach((c) => {
+      if (c === childId) return (child = i.id);
+    });
+  });
 
-    return child;
+  return child;
 };
 
-export const getTransactionsById = async(pId) => {
+export const getTransactionsById = async (pId) => {
   const db = fire.firestore();
-  let data = await db.collection("transactions")
-  .get()
+  let data = await db.collection("transactions").get();
 
-  let res = []
-  data.docs.forEach(i => {
-    if(i.data().receiver_id === pId && i.data().state === "Pending"){
-      res.push(i.data())
+  let res = [];
+  data.docs.forEach((i) => {
+    console.log("data:--------- " + pId);
+    if (i.data().receiver_id === pId && i.data().state === "Pending") {
+      res.push(i.data());
     }
-  })
-  
+  });
+  // console.log("res", res);
   return res;
-};
+};;;;;;;;;;
 
 //Updating Document in FB Firestore
 export const updateUserData = (

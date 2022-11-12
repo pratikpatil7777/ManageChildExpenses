@@ -67,21 +67,21 @@ export const parentResponseToChildRequest = (transactionId, toBeState, successFn
     db.collection("transactions")
     .doc(transactionId)
     .get()
-    .then((res) => {
-      res.data().state = "Done";
-      successFn("Done!");
+    .update({
+      state:"Done"
     })
     .catch((err) => errorFn(err));
+    successFn("Done!");
   }else{
     db.collection("transactions")
     .doc(transactionId)
     .get()
-    .then((res) => {
-      res.data().state = "Denied";
-      successFn("Denied!");
+    .get()
+    .update({
+      state:"Denied"
     })
     .catch((err) => errorFn(err));
-
+    successFn("Done!");
   }
   
 

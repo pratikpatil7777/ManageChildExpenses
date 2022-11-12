@@ -38,9 +38,6 @@ export default function RequestedMoneyV() {
   const getDataFromFB = () => {
     setloading(true);
     let user = fire.auth().currentUser;
-    const res = [];
-    const transactions = [];
-    const amt = [];
     getUserData(
       user?.uid,
       async (s) => {
@@ -112,12 +109,6 @@ export default function RequestedMoneyV() {
     getDataFromFB();
   }, []);
 
-  // useEffect(() => {
-  //   if (isParent === true) {
-  //     let allReq = getTransactionsById(userObj.uid);
-  //     console.log("all reqqqqqqq", allReq);
-  //   }
-  // });
 
   useEffect(() => {
     console.log("all reqqqqqqq", allReqArr);
@@ -138,11 +129,6 @@ export default function RequestedMoneyV() {
     }
     getParent();
   }, []);
-
-  // let user = fire.auth().currentUser;
-  // console.log("============ "+(user.uid));
-  // let pd = getParentByChildId(user.uid);
-  // console.log("pd:--------- "+pd);
 
   const handleReqM = (e) => {
     const { name, value } = e.target;

@@ -44,16 +44,6 @@ export const FBsignup = ({ email, password, fullName }, successFn, errorFn) => {
     .then(() => {
       console.log("user created");
       let user = firebase.auth().currentUser;
-      // user
-      //   // .updateProfile({
-      //   //   photoURL: randomProfile.toString(),
-      //   // })
-      //   .then(() => {
-      //     successFn(firebase.auth().currentUser, userData);
-      //   })
-      //   .catch(() => {
-      //     console.log("Error Updating Profile Pic");
-      //   });
       // Pushing to Firestore
       db.collection("users")
         .doc(user.uid)
@@ -67,6 +57,34 @@ export const FBsignup = ({ email, password, fullName }, successFn, errorFn) => {
       console.log(error);
       errorFn(error);
     });
+};
+
+export const parentResponseToChildRequest = (transactionId, toBeState, successFn, errorFn) => {
+
+  const db = fire.firestore();
+
+  if(toBeState == 'Accept'){
+    db.collection("transactions")
+    .doc(transactionId)
+    .get()
+    .then((res) => {
+      res.data().state = "Done";
+      successFn("Done!");
+    })
+    .catch((err) => errorFn(err));
+  }else{
+    db.collection("transactions")
+    .doc(transactionId)
+    .get()
+    .then((res) => {
+      res.data().state = "Denied";
+      successFn("Denied!");
+    })
+    .catch((err) => errorFn(err));
+
+  }
+  
+
 };
 
 //func to create a child for logged parent
@@ -184,7 +202,7 @@ export const getTransactionsById = async (pId) => {
   });
   // console.log("res", res);
   return res;
-};;;;;;;;;;
+};
 
 //Updating Document in FB Firestore
 export const updateUserData = (

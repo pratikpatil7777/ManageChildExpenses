@@ -63,50 +63,52 @@ export const parentResponseToChildRequest = async (transactionId, toBeState, amo
 
   const db = fire.firestore();
 
-  if(toBeState == 'Accept'){
-
-    await db.collection("transactions").doc(transactionId).get().then(async (reso)=>{
-      if (reso.exists) {
-        //console.log("Document data:", reso.data().receiver_id);
-        let currWallet = 0;
-        let userId = reso.data().receiver_id;
-        await db.collection("users").doc(userId).get().then(async (resp) =>{
-          //console.log("Document data:", resp.data().wallet);
-          currWallet = resp.data().wallet;
-          if(currWallet >= amount){
-            console.log("Document data:", currWallet);
-            currWallet -= amount;
-            await db.collection("users").doc(userId).update({
-              wallet : currWallet
-            })
-            .catch((err) => errorFn(err));
-          }else{
-            return;
-          }
+  try{
+    if(toBeState == 'Accept'){
+  
+      await db.collection("transactions").doc(transactionId).get().then(async (reso)=>{
+        if (reso.exists) {
+          //console.log("Document data:", reso.data().receiver_id);
+          let currWallet = 0;
+          let userId = reso.data().receiver_id;
+          await db.collection("users").doc(userId).get().then(async (resp) =>{
+            //console.log("Document data:", resp.data().wallet);
+            currWallet = resp.data().wallet;
+            if(currWallet >= amount){
+              console.log("Document data:", currWallet);
+              currWallet -= amount;
+              await db.collection("users").doc(userId).update({
+                wallet : currWallet
+              })
+              .catch((err) => errorFn(err));
+            }else{
+              throw "Not enough money!";
+            }
+          })
+          
+      }
+      });
+  
+      db.collection("transactions")
+        .doc(transactionId)
+        .update({
+          state: "Done",
         })
-        
-    }
-    });
-
-
-    db.collection("transactions")
-      .doc(transactionId)
-      .update({
-        state: "Done",
-      })
-      .catch((err) => errorFn(err));
-    successFn("Done!");
-  }else{
-    db.collection("transactions")
-      .doc(transactionId)
-      .update({
-        state: "Denied",
-      })
-      .catch((err) => errorFn(err));
-    successFn("Done!");
+        .catch((err) => errorFn(err));
+      successFn("Done!");
+    }else{
+      db.collection("transactions")
+        .doc(transactionId)
+        .update({
+          state: "Denied",
+        })
+        .catch((err) => errorFn(err));
+      successFn("Done!");
+    }  
+  }catch(e){
+    return;
   }
   
-
 };
 
 //func to create a child for logged parent

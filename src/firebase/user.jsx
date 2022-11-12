@@ -59,11 +59,36 @@ export const FBsignup = ({ email, password, fullName }, successFn, errorFn) => {
     });
 };
 
-export const parentResponseToChildRequest = (transactionId, toBeState, successFn, errorFn) => {
+export const parentResponseToChildRequest = async (transactionId, toBeState, amount, successFn, errorFn) => {
 
   const db = fire.firestore();
 
   if(toBeState == 'Accept'){
+
+    await db.collection("transactions").doc(transactionId).get().then(async (reso)=>{
+      if (reso.exists) {
+        //console.log("Document data:", reso.data().receiver_id);
+        let currWallet = 0;
+        let userId = reso.data().receiver_id;
+        await db.collection("users").doc(userId).get().then(async (resp) =>{
+          //console.log("Document data:", resp.data().wallet);
+          currWallet = resp.data().wallet;
+          if(currWallet >= amount){
+            console.log("Document data:", currWallet);
+            currWallet -= amount;
+            await db.collection("users").doc(userId).update({
+              wallet : currWallet
+            })
+            .catch((err) => errorFn(err));
+          }else{
+            return;
+          }
+        })
+        
+    }
+    });
+
+
     db.collection("transactions")
       .doc(transactionId)
       .update({

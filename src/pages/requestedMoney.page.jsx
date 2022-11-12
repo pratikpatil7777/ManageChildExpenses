@@ -219,6 +219,7 @@ export default function RequestedMoneyV() {
                             parentResponseToChildRequest(
                               reqq.id,
                               "Accept",
+                              reqq.amount,
                               (s) => {
                                 console.log("Req accepted");
                               },
@@ -234,6 +235,7 @@ export default function RequestedMoneyV() {
                           onClick={() => {
                             parentResponseToChildRequest(
                               reqq.id,
+                              reqq.amount,
                               "Deny",
                               (s) => {
                                 console.log("Req denied");

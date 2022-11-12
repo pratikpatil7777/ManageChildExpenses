@@ -11,6 +11,7 @@ import {
   getUserData,
   getParentByChildId,
   getTransactionsById,
+  getSpecificUsers,
 } from "../firebase/user";
 import { requestMoney } from "./../firebase/vasooli";
 import { data } from "jquery";
@@ -52,6 +53,24 @@ export default function RequestedMoneyV() {
           let senderIds = allReq.map((i) => {
             return i.sender_id;
           });
+          console.log(senderIds);
+          getSpecificUsers(
+            senderIds,
+            (s) => {
+              let senderMap = {};
+              console.log(s);
+              s.map((i) => {
+                senderMap[i.id] = i.name;
+              });
+              console.log("map: ", senderMap);
+              allReq.forEach((i) => {
+                i["childName"] = senderMap[i.sender_id];
+              });
+              console.log(allReq);
+              setAllReqArr(allReq);
+            },
+            (e) => {}
+          );
 
           // allReq.forEach((ele, idx) => {
           //   // console.log("senderids", ele.sender_id);
@@ -70,7 +89,6 @@ export default function RequestedMoneyV() {
           //   );
           // });
 
-          setAllReqArr(allReq);
           // setName(res);
           // setAmounts(amt);
           // console.log(
@@ -203,8 +221,8 @@ export default function RequestedMoneyV() {
               </thead>
               {allReqArr && allReqArr.length > 0 ? (
                 <tbody>
-                  {allReqArr.map((reqq) => (
-                    <tr key={reqq.sender_id}>
+                  {allReqArr.map((reqq, idx) => (
+                    <tr key={idx}>
                       <td>{reqq.childName}</td>
                       <td>{reqq.amount}</td>
                       <td>{reqq.state}</td>

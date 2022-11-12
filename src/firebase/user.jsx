@@ -57,7 +57,7 @@ export const FBsignup = ({ email, password, fullName }, successFn, errorFn) => {
       // Pushing to Firestore
       db.collection("users")
         .doc(user.uid)
-        .set({ id: user.uid, userData })
+        .set({ id: user.uid, ...userData })
         .then(() => {
           console.log("Pushed to Firestore");
         })
@@ -101,7 +101,7 @@ export const createChild = (
 
           db.collection("users")
             .doc(firebase.auth().currentUser.uid)
-            .set(childData)
+            .set({ id: firebase.auth().currentUser.uid, ...childData })
             .then(() => {
               console.log("Pushed to Firestore");
             })
@@ -129,13 +129,16 @@ export const getUserData = (uid, successFn, errorFn) => {
 
 export const getSpecificUsers = (userIDs, successFn, errorFn) => {
   const db = fire.firestore();
+  console.log("senders: ", userIDs);
   db.collection("users")
     .where("id", "in", userIDs)
     .get()
     .then((res) => {
+      console.log("length: ", res.docs.length);
       const data = res.docs.map((i) => {
         return i.data();
       });
+      console.log("data: ", data);
       successFn(data);
     })
     .catch((err) => errorFn(err));

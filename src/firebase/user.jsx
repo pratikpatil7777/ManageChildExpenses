@@ -106,7 +106,7 @@ export const parentResponseToChildRequest = async (transactionId, toBeState, amo
       successFn("Done!");
     }  
   }catch(e){
-    return;
+    throw "Something went wrong!";
   }
   
 };

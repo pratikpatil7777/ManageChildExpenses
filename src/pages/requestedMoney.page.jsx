@@ -12,10 +12,11 @@ import {
   getParentByChildId,
   getTransactionsById,
   getSpecificUsers,
+  parentResponseToChildRequest,
 } from "../firebase/user";
 import { requestMoney } from "./../firebase/vasooli";
 import { data } from "jquery";
-import { Table } from "react-bootstrap";
+import { Button, Table } from "react-bootstrap";
 export default function RequestedMoneyV() {
   const [filter, setfilter] = useState("ALL");
   const [SendToCardFilter, setSendToCardFilter] = useState("ALL");
@@ -50,20 +51,20 @@ export default function RequestedMoneyV() {
           let senderIds = allReq.map((i) => {
             return i.sender_id;
           });
-          console.log(senderIds);
+          // console.log(senderIds);
           getSpecificUsers(
             senderIds,
             (s) => {
               let senderMap = {};
-              console.log(s);
+              // console.log(s);
               s.map((i) => {
                 senderMap[i.id] = i.name;
               });
-              console.log("map: ", senderMap);
+              // console.log("map: ", senderMap);
               allReq.forEach((i) => {
                 i["childName"] = senderMap[i.sender_id];
               });
-              console.log(allReq);
+              // console.log(allReq);
               setAllReqArr(allReq);
             },
             (e) => {}
@@ -109,9 +110,8 @@ export default function RequestedMoneyV() {
     getDataFromFB();
   }, []);
 
-
   useEffect(() => {
-    console.log("all reqqqqqqq", allReqArr);
+    // console.log("all reqqqqqqq", allReqArr);
   }, [allReqArr]);
 
   useEffect(() => {
@@ -141,7 +141,7 @@ export default function RequestedMoneyV() {
   };
 
   // console.log(reqM);
-  // console.log("all reqqqqqqq", allReqArr);
+  console.log("allreqqqqqqq", allReqArr);
   return (
     <Fragment>
       <div className="row" style={{ marginBottom: "7px" }}>
@@ -202,7 +202,8 @@ export default function RequestedMoneyV() {
                 <tr>
                   <th>Child Name</th>
                   <th>Amount</th>
-                  <th>Accept/Deny</th>
+                  <th>Status</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               {allReqArr && allReqArr.length > 0 ? (
@@ -212,6 +213,40 @@ export default function RequestedMoneyV() {
                       <td>{reqq.childName}</td>
                       <td>{reqq.amount}</td>
                       <td>{reqq.state}</td>
+                      <td>
+                        <Button
+                          onClick={() => {
+                            parentResponseToChildRequest(
+                              reqq.id,
+                              "Accept",
+                              (s) => {
+                                console.log("Req accepted");
+                              },
+                              (e) => {
+                                console.log("func not success");
+                              }
+                            );
+                          }}
+                        >
+                          Accept
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            parentResponseToChildRequest(
+                              reqq.id,
+                              "Deny",
+                              (s) => {
+                                console.log("Req denied");
+                              },
+                              (e) => {
+                                console.log("func not success");
+                              }
+                            );
+                          }}
+                        >
+                          Deny
+                        </Button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

@@ -65,22 +65,19 @@ export const parentResponseToChildRequest = (transactionId, toBeState, successFn
 
   if(toBeState == 'Accept'){
     db.collection("transactions")
-    .doc(transactionId)
-    .get()
-    .update({
-      state:"Done"
-    })
-    .catch((err) => errorFn(err));
+      .doc(transactionId)
+      .update({
+        state: "Done",
+      })
+      .catch((err) => errorFn(err));
     successFn("Done!");
   }else{
     db.collection("transactions")
-    .doc(transactionId)
-    .get()
-    .get()
-    .update({
-      state:"Denied"
-    })
-    .catch((err) => errorFn(err));
+      .doc(transactionId)
+      .update({
+        state: "Denied",
+      })
+      .catch((err) => errorFn(err));
     successFn("Done!");
   }
   

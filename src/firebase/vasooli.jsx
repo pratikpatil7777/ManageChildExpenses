@@ -47,17 +47,16 @@ export const requestMoney = (
 
 export const allocateMoney = async (childrenIds, amount, category) => {
   const db = fire.firestore();
-  console.log(fire,"-=-=-=-=-=-=-=-=-=-=");
-  let user = fire.auth().currentUser; 
-  user = "FznmidkiCVNOMWuqmZn42JrNrVt1";
-  console.log(user,"-0-0-0-0-0-0-0-0-0-0-");
+  let userId = fire.auth().currentUser.uid; 
+  console.log(userId,"--------------");
   const currUser = await db.collection("users")
-  .doc(user)
+  .doc(userId)
   .get();
 
   console.log(currUser,"-------------------==============-=-=-==-=-=-=-=-=-=-=-=-");
 
 };
+//allocateMoney([1,2], 30, "asd");
 
 //Get Vasooli's by Filter
 export const getVasooliByFilter = (email, filter, successFn, errorFn) => {

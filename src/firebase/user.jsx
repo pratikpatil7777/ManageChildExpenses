@@ -2,6 +2,7 @@ import fire from "./fire";
 import axios from "axios";
 import firebase1 from 'firebase/app'
 import { data } from "jquery";
+import { allocateMoney } from "./vasooli";
 const firebase = fire;
 
 
@@ -219,12 +220,23 @@ export const getTransactionsById = async (pId) => {
 
   let res = [];
   data.docs.forEach((i) => {
-    console.log("data:--------- " + pId);
     if (i.data().receiver_id === pId && i.data().state === "Pending") {
       res.push({...i.data(), id: i.id});
     }
   });
-  // console.log("res", res);
+  return res;
+};
+
+export const getTransactions = async (pId) => {
+  const db = fire.firestore();
+  let data = await db.collection("transactions").get();
+
+  let res = [];
+  data.docs.forEach((i) => {
+    if (i.data().receiver_id === pId) {
+      res.push({...i.data(), id: i.id});
+    }
+  });
   return res;
 };
 

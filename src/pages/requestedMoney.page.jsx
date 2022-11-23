@@ -26,6 +26,8 @@ export default function RequestedMoneyV() {
   const [userObj, setUserObj] = useState({});
   const [isParent, setIsParent] = useState(false);
   const [parentID, setParentID] = useState("");
+  const [buttonState, setButtonState] = useState(false);
+  // const [buttonStatus, setButtonStatus] = useState("");
   const [reqM, setReqM] = useState({
     receiver_id: "",
     amount: "",
@@ -63,6 +65,8 @@ export default function RequestedMoneyV() {
               // console.log("map: ", senderMap);
               allReq.forEach((i) => {
                 i["childName"] = senderMap[i.sender_id];
+                i["buttonState"] = false;
+                i["buttonStatus"] = "";
               });
               // console.log(allReq);
               setAllReqArr(allReq);
@@ -211,43 +215,73 @@ export default function RequestedMoneyV() {
                   {allReqArr.map((reqq, idx) => (
                     <tr key={idx}>
                       <td>{reqq.childName}</td>
-                      <td>{reqq.amount}</td>
-                      <td>{reqq.state}</td>
+                      <td>{reqq.buttonState === false ? reqq.amount : "-"}</td>
                       <td>
-                        <Button
-                          onClick={() => {
-                            parentResponseToChildRequest(
-                              reqq.id,
-                              "Accept",
-                              reqq.amount,
-                              (s) => {
-                                console.log("Req accepted");
-                              },
-                              (e) => {
-                                console.log("func not success");
-                              }
-                            );
-                          }}
-                        >
-                          Accept
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            parentResponseToChildRequest(
-                              reqq.id,
-                              reqq.amount,
-                              "Deny",
-                              (s) => {
-                                console.log("Req denied");
-                              },
-                              (e) => {
-                                console.log("func not success");
-                              }
-                            );
-                          }}
-                        >
-                          Deny
-                        </Button>
+                        {reqq.buttonState === false ? reqq.state : "Done ✅"}
+                      </td>
+                      <td>
+                        {reqq.buttonState === false && (
+                          <Button
+                            onClick={() => {
+                              parentResponseToChildRequest(
+                                reqq.id,
+                                "Accept",
+                                reqq.amount,
+                                (s) => {
+                                  console.log("Req accepted");
+                                  allReqArr[idx].buttonState = true;
+                                  allReqArr[idx].buttonStatus =
+                                    "Accepted Suceessfully";
+                                  // let newReqArr = { ...allReqArr };
+                                  setAllReqArr(allReqArr);
+                                  setButtonState(true);
+                                },
+                                (e) => {
+                                  console.log("func not success");
+                                }
+                              );
+                              console.log(
+                                allReqArr,
+                                "Accepted........................."
+                              );
+                              // setButtonState(true);
+                              // setButtonStatus("Acepted Suceessfully");
+                            }}
+                          >
+                            Accept
+                          </Button>
+                        )}
+                        {reqq.buttonState === false && (
+                          <Button
+                            onClick={() => {
+                              parentResponseToChildRequest(
+                                reqq.id,
+                                reqq.amount,
+                                "Deny",
+                                (s) => {
+                                  console.log("Req denied");
+                                  allReqArr[idx].buttonState = true;
+                                  allReqArr[idx].buttonStatus =
+                                    "Denied Suceessfully";
+
+                                  // let newReqArr = { ...allReqArr };
+                                  setAllReqArr(allReqArr);
+                                  setButtonState(true);
+                                },
+                                (e) => {
+                                  console.log("func not success");
+                                }
+                              );
+                              console.log(
+                                allReqArr,
+                                "Denied........................."
+                              );
+                            }}
+                          >
+                            Deny
+                          </Button>
+                        )}
+                        {buttonState && <h4>{allReqArr[idx].buttonStatus}</h4>}
                       </td>
                     </tr>
                   ))}

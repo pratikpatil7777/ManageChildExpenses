@@ -1,11 +1,9 @@
 import fire from "./fire";
 import axios from "axios";
-import firebase1 from 'firebase/app'
+import firebase1 from "firebase/app";
 import { data } from "jquery";
 import { allocateMoney } from "./vasooli";
 const firebase = fire;
-
-
 
 //Function to Login the Exsiting user
 export const FBlogin = ({ email, password }, successFn, errorFn) => {
@@ -60,36 +58,50 @@ export const FBsignup = ({ email, password, fullName }, successFn, errorFn) => {
     });
 };
 
-export const parentResponseToChildRequest = async (transactionId, toBeState, amount, successFn, errorFn) => {
-
+export const parentResponseToChildRequest = async (
+  transactionId,
+  toBeState,
+  amount,
+  successFn,
+  errorFn
+) => {
   const db = fire.firestore();
 
-  try{
-    if(toBeState == 'Accept'){
-  
-      await db.collection("transactions").doc(transactionId).get().then(async (reso)=>{
-        if (reso.exists) {
-          //console.log("Document data:", reso.data().receiver_id);
-          let currWallet = 0;
-          let userId = reso.data().receiver_id;
-          await db.collection("users").doc(userId).get().then(async (resp) =>{
-            //console.log("Document data:", resp.data().wallet);
-            currWallet = resp.data().wallet;
-            if(currWallet >= amount){
-              console.log("Document data:", currWallet);
-              currWallet -= amount;
-              await db.collection("users").doc(userId).update({
-                wallet : currWallet
-              })
-              .catch((err) => errorFn(err));
-            }else{
-              throw "Not enough money!";
-            }
-          })
-          
-      }
-      });
-  
+  try {
+    if (toBeState == "Accept") {
+      await db
+        .collection("transactions")
+        .doc(transactionId)
+        .get()
+        .then(async (reso) => {
+          if (reso.exists) {
+            //console.log("Document data:", reso.data().receiver_id);
+            let currWallet = 0;
+            let userId = reso.data().receiver_id;
+            await db
+              .collection("users")
+              .doc(userId)
+              .get()
+              .then(async (resp) => {
+                //console.log("Document data:", resp.data().wallet);
+                currWallet = resp.data().wallet;
+                if (currWallet >= amount) {
+                  console.log("Document data:", currWallet);
+                  currWallet -= amount;
+                  await db
+                    .collection("users")
+                    .doc(userId)
+                    .update({
+                      wallet: currWallet,
+                    })
+                    .catch((err) => errorFn(err));
+                } else {
+                  throw "Not enough money!";
+                }
+              });
+          }
+        });
+
       db.collection("transactions")
         .doc(transactionId)
         .update({
@@ -97,7 +109,7 @@ export const parentResponseToChildRequest = async (transactionId, toBeState, amo
         })
         .catch((err) => errorFn(err));
       successFn("Done!");
-    }else{
+    } else {
       db.collection("transactions")
         .doc(transactionId)
         .update({
@@ -105,11 +117,10 @@ export const parentResponseToChildRequest = async (transactionId, toBeState, amo
         })
         .catch((err) => errorFn(err));
       successFn("Done!");
-    }  
-  }catch(e){
+    }
+  } catch (e) {
     throw "Something went wrong!";
   }
-  
 };
 
 //func to create a child for logged parent
@@ -221,20 +232,20 @@ export const getTransactionsById = async (pId) => {
   let res = [];
   data.docs.forEach((i) => {
     if (i.data().receiver_id === pId && i.data().state === "Pending") {
-      res.push({...i.data(), id: i.id});
+      res.push({ ...i.data(), id: i.id });
     }
   });
   return res;
 };
 
-export const getTransactions = async (pId) => {
+export const getAllTransactions = async (pId) => {
   const db = fire.firestore();
   let data = await db.collection("transactions").get();
 
   let res = [];
   data.docs.forEach((i) => {
     if (i.data().receiver_id === pId) {
-      res.push({...i.data(), id: i.id});
+      res.push({ ...i.data(), id: i.id });
     }
   });
   return res;

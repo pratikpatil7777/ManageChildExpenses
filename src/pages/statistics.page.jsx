@@ -3,163 +3,92 @@ import { getTransactionByFilter } from "./../firebase/transaction";
 import fire from "./../firebase/fire";
 import { useLocation } from "react-router-dom";
 import categories from "./../data/categories";
-import { PieChart, Pie, Legend, Tooltip } from "recharts";
-import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid } from "recharts";
+// import { PieChart, Pie, Legend, Tooltip } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from "recharts";
 import loadingImg from "./../assets/img/Dash-Loading.gif";
 import Empty from "./../components/general/empty.component";
 import "./statistics.style.css";
 import { getAllTransactions } from "../firebase/user";
 
-export default async function StatisticsV() {
+export default function StatisticsV() {
   const [allTrans, setAllTrans] = useState([]);
-  let user = fire.auth().currentUser;
-  const arr = await getAllTransactions(user.uid);
-  console.log(arr, "===================");
-  // const [TransactionsArr, setTransactionsArr] = useState([]);
-  // const [IncomePieData, setIncomePieData] = useState([]);
-  // const [ExpensePieData, seExpensePieData] = useState([]);
-  // const [netIncome, setnetIncome] = useState(0);
-  // const [netExpense, setnetExpense] = useState(0);
-  // const [monthdata, setmonthdata] = useState([]);
-  // const [categorywise, setcategorywise] = useState([]);
-  // const [PieDim, setPieDim] = useState({
-  //   width: 0,
-  //   height: 0,
-  // });
-  // const [BarDim, setBarDim] = useState({
-  //   width: 0,
-  //   height: 0,
-  // });
-  // const [loading, setloading] = useState(true);
-  // const [user, setuser] = useState({});
-  // let loc = useLocation();
+  const graphData = [];
+  useEffect(() => {
+    async function getmyTransactions() {
+      let user = fire.auth().currentUser;
+      let pd = await getAllTransactions(user.uid);
+      pd.forEach((element) => {
+        const dateFormat = new Date(1970, 0, 1);
+        dateFormat.setSeconds(element.timestamp.seconds);
+        // console.log(dateFormat);
+        // console.log(
+        //   dateFormat.getMonth() +
+        //     1 +
+        //     "/" +
+        //     dateFormat.getDate() +
+        //     "/" +
+        //     dateFormat.getFullYear()
+        // );
+        const myDate =
+          dateFormat.getMonth() +
+          1 +
+          "/" +
+          dateFormat.getDate() +
+          "/" +
+          dateFormat.getFullYear();
+        graphData.push({
+          Date: myDate,
+          category: element.category,
+          Amount: element.amount,
+        });
+      });
+      setAllTrans(graphData);
+      // setParentID(pd);
+      // setReqM((prev) => {
+      //   return {
+      //     ...prev,
+      //     receiver_id: pd,
+      //   };
+      // });
+    }
+    getmyTransactions();
+  }, []);
 
-  // const BarDataMaking = (TransactionsArr) => {
-  //   let inc = [0, 0, 0, 0, 0, 0];
-  //   let exp = [0, 0, 0, 0, 0, 0];
-  //   const monthArr = [
-  //     "Jan-Feb",
-  //     "Mar-Apr",
-  //     "May-Jun",
-  //     "Jul-Aug",
-  //     "Sep-Oct",
-  //     "Nov-Dec",
-  //   ];
-  //   TransactionsArr.map((trans) => {
-  //     if (trans.type === "INC") {
-  //       let dt = new Date(trans.date);
-  //       let month = dt.getMonth();
-  //       inc[parseInt(month / 2)] += parseInt(trans.amount);
-  //     } else if (trans.type === "EXP") {
-  //       let dt = new Date(trans.date);
-  //       let month = dt.getMonth();
-  //       exp[parseInt(month / 2)] += parseInt(trans.amount);
-  //     }
-  //   });
-  //   //    console.log(inc, exp);
-  //   let bardata = [];
-  //   for (let i in inc) {
-  //     bardata.push({
-  //       Months: monthArr[i],
-  //       Income: inc[i],
-  //       Expense: exp[i],
-  //     });
-  //   }
-  //   setmonthdata(bardata);
-  // };
-
-  // const PieDataMaking = (TransactionsArr) => {
-  //   let inc = [0, 0, 0],
-  //     exp = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-  //   //console.log(TransactionsArr);
-  //   TransactionsArr.map((trans) => {
-  //     if (trans.type === "INC") {
-  //       let catIndex = parseInt(trans.category);
-  //       inc[catIndex] += parseInt(trans.amount);
-  //     } else if (trans.type === "EXP") {
-  //       let catIndex = parseInt(trans.category) - 3;
-  //       exp[catIndex] += parseInt(trans.amount);
-  //     }
-  //   });
-  //   //console.log(inc, exp);
-  //   let incObjArr = [],
-  //     expObjArr = [],
-  //     incSum = 0,
-  //     expSum = 0;
-  //   inc.map((d, index) => {
-  //     let obj = {
-  //       name: categories[index].title,
-  //       value: d,
-  //     };
-  //     incSum += d;
-  //     //console.log(obj);
-  //     incObjArr.push(obj);
-  //   });
-  //   exp.map((d, index) => {
-  //     expObjArr.push({
-  //       name: categories[index + 3].title,
-  //       value: d,
-  //     });
-  //     expSum += d;
-  //   });
-  //   //console.log(incObjArr, expObjArr);
-  //   setIncomePieData(incObjArr);
-  //   seExpensePieData(expObjArr);
-  //   setnetIncome(incSum);
-  //   setnetExpense(expSum);
-  //   setcategorywise(inc.concat(exp));
-  // };
-
-  // useEffect(() => {
-  //   setloading(true);
-  //   if (window.innerWidth > 810) {
-  //     //Desktop
-  //     setPieDim({
-  //       width: window.innerWidth / 4,
-  //       height: window.innerHeight / 2,
-  //     });
-  //     setBarDim({
-  //       width: window.innerWidth * 0.7,
-  //       height: window.innerHeight * 0.4,
-  //     });
-  //   } else {
-  //     setPieDim({
-  //       width: window.innerWidth * 0.8,
-  //       height: window.innerHeight / 2,
-  //     });
-  //     setBarDim({
-  //       width: window.innerWidth * 0.98,
-  //       height: window.innerHeight * 0.3,
-  //     });
-  //   }
-  //   fire.auth().onAuthStateChanged(function (user) {
-  //     if (user) {
-  //       setuser(user);
-  //       getTransactionByFilter(
-  //         user.uid,
-  //         "ALL",
-  //         (res) => {
-  //           let Arr = [];
-  //           res.forEach((item) => {
-  //             Arr.push(item.data());
-  //           });
-  //           //            console.log(Arr);
-
-  //           setTransactionsArr(Arr);
-  //           PieDataMaking(Arr);
-  //           BarDataMaking(Arr);
-  //           setloading(false);
-  //         },
-  //         (err) => console.log(err)
-  //       );
-  //     } else {
-  //       //console.log("NO user AUth Change");
-  //     }
-  //   });
-  // }, [loc.pathname]);
   return (
     <Fragment>
       <h1>User Statistics</h1>
+      <LineChart
+        width={1200}
+        height={700}
+        data={allTrans}
+        // margin={{
+        //   top: 5,
+        //   right: 30,
+        //   left: 20,
+        //   bottom: 5,
+        // }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="Date" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Line
+          type="monotone"
+          dataKey="Amount"
+          stroke="#8884d8"
+          activeDot={{ r: 8 }}
+        />
+        {/* <Line type="monotone" dataKey="amount" stroke="#82ca9d" /> */}
+      </LineChart>
       {/* {loading ? (
         <img src={loadingImg} className="w-100 m-auto" />
       ) : (

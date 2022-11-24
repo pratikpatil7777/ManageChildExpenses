@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
 import Spinner from "react-bootstrap/Spinner";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useHistory } from "react-router-dom";
 import { getVasooliByFilter } from "./../firebase/vasooli";
 // import fire from "./../firebase/fire";
 import Vasoolicard from "./../components/allocateMoney/vasoolicard";
@@ -14,9 +14,11 @@ import {
   getSpecificUsers,
   parentResponseToChildRequest,
 } from "../firebase/user";
+import { useAlert } from "react-alert";
 import { requestMoney } from "./../firebase/vasooli";
 import { data } from "jquery";
 import { Button, Table } from "react-bootstrap";
+
 export default function RequestedMoneyV() {
   const [filter, setfilter] = useState("ALL");
   const [SendToCardFilter, setSendToCardFilter] = useState("ALL");
@@ -144,8 +146,11 @@ export default function RequestedMoneyV() {
     });
   };
 
-  // console.log(reqM);
-  console.log("allreqqqqqqq", allReqArr);
+  // console.log("allreqqqqqqq", allReqArr);
+
+  const history = useHistory();
+  // const alert = useAlert();
+
   return (
     <Fragment>
       <div className="row" style={{ marginBottom: "7px" }}>
@@ -200,7 +205,7 @@ export default function RequestedMoneyV() {
           </div>
         ) : (
           <>
-            <div>you are a parent</div>
+            {/* <h1>you are a parent</h1> */}
             <Table striped bordered hover>
               <thead>
                 <tr>
@@ -240,10 +245,18 @@ export default function RequestedMoneyV() {
                                   console.log("func not success");
                                 }
                               );
+
+                              alert("Transation Accepted Suceessfully");
+
+                              history.push("/");
+
                               console.log(
                                 allReqArr,
                                 "Accepted........................."
                               );
+                              // {
+                              //   navigate("/requestedMoney");
+                              // }
                               // setButtonState(true);
                               // setButtonStatus("Acepted Suceessfully");
                             }}
@@ -253,6 +266,7 @@ export default function RequestedMoneyV() {
                         )}
                         {reqq.buttonState === false && (
                           <Button
+                            style={{ marginLeft: "4px" }}
                             onClick={() => {
                               parentResponseToChildRequest(
                                 reqq.id,
@@ -272,6 +286,9 @@ export default function RequestedMoneyV() {
                                   console.log("func not success");
                                 }
                               );
+                              alert("Transation Denied Suceessfully");
+
+                              history.push("/");
                               console.log(
                                 allReqArr,
                                 "Denied........................."

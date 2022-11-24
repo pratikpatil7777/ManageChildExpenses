@@ -4,6 +4,7 @@ import {
   Switch,
   Route,
   Link,
+  useHistory,
   Redirect,
   useLocation,
 } from "react-router-dom";
@@ -91,11 +92,6 @@ const App = () => {
       mql.removeListener(mediaQueryChanged);
     };
   }, []);
-
-  // const btnClick = () => {
-  //   console.log("Btn CLicked")
-  //   setSidebaropen(true)
-  // }
 
   return (
     <Router>

@@ -2,7 +2,7 @@ import React from "react";
 import categories from "../../data/categories";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "./transactioncard.style.css";
-export default function ChildrenCard() {
+export default function ChildrenCard({ name, wallet, email }) {
   return (
     // <div
     //   className={
@@ -27,16 +27,16 @@ export default function ChildrenCard() {
           marginTop: "7px",
         }}
       >
-        Adam Smith
+        {name}
       </p>
       {/* </div> */}
       <div className="col-10 justify-content-start text-left">
         <h6 className="card-title m-0">
-          <strong>Available Balance</strong>: $0
+          <strong>Available Balance</strong>: ${wallet}
           <i aria-hidden="true" style={{ fontSize: "18px" }}></i>
         </h6>
         <small className="card-text" style={{ lineHeight: "1.2" }}>
-          Email ID : adamsmith@gmail.com
+          Email ID : {email}
         </small>
 
         {/* <hr className="m-1" />

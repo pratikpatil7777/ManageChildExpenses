@@ -1,7 +1,7 @@
 import React, { Fragment, useState, useEffect } from "react";
 import { getTransactionByFilter } from "./../firebase/transaction";
 import fire from "./../firebase/fire";
-import { useLocation } from "react-router-dom";
+import { useLocation, useHistory } from "react-router-dom";
 import categories from "./../data/categories";
 import { PieChart, Pie, Legend, Tooltip } from "recharts";
 import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid } from "recharts";
@@ -10,13 +10,16 @@ import Empty from "./../components/general/empty.component";
 import "./dashboard.style.css";
 import TypeWriterEffect from "react-typewriter-effect";
 import MyParticles from "./particles";
-import { getAllUser, getUserData } from "../firebase/user";
+import { getAllUser, getUserData, addMoney } from "../firebase/user";
 
 export default function DashboardV() {
   const [allUser, setAllUser] = useState([]);
   const [userObj, setUserObj] = useState({});
   const [userType, setUserType] = useState("");
   const [loading, setloading] = useState(true);
+  const [amount, setAmount] = useState(0);
+
+  const history = useHistory();
 
   // useEffect(()=> {
   //   const res = getAllUser()
@@ -196,6 +199,8 @@ export default function DashboardV() {
   //     }
   //   });
   // }, [loc.pathname]);
+
+  // console.log(amount);
   return (
     <>
       <MyParticles />
@@ -228,8 +233,37 @@ export default function DashboardV() {
               fuga laudantium quibusdam sequi totam veniam?
             </p> */}
           </div>
-          <a href="#">Contact Us</a>
         </div>
+        <br />
+        {userType === "Parent" && (
+          <div style={{ display: "flex" }}>
+            <input
+              type="number"
+              className="form-control"
+              placeholder="Add money to wallet"
+              onChange={(e) => setAmount(e.target.value)}
+            ></input>
+            <button
+              className="btn btn-info mx-1"
+              onClick={() => {
+                addMoney(
+                  amount,
+                  (s) => {
+                    // console.log("Money added to your wallet successfully");
+                    alert("Money added to your wallet successfully");
+                    history.push("/");
+                    setAmount(0);
+                  },
+                  (e) => {
+                    console.log("req failed");
+                  }
+                );
+              }}
+            >
+              Add
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

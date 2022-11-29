@@ -93,6 +93,8 @@ export default function ProfileV() {
     }
   }, [success]);
 
+  // console.log(user);
+
   return (
     <Fragment>
       {success && sucessAlert()}
@@ -159,11 +161,11 @@ export default function ProfileV() {
                     value={user.fullName}
                     name="fullName"
                     onChange={handleChange}
-                    placeholder="John Doe"
+                    placeholder={user.name}
                   />
                 </div>
               </div>
-              <div className="form-group row">
+              {/* <div className="form-group row">
                 <label className="col-sm-2 col-form-label">Address </label>
                 <div className="col-sm-10">
                   <input
@@ -175,7 +177,7 @@ export default function ProfileV() {
                     placeholder="123 Street, Apt no. 2, NJ, USA"
                   />
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
           <div className="row text-center justify-content-center">

@@ -18,7 +18,7 @@ export default function AddChild({ setdp }) {
 
   const handleChange = (e) => {
     setuser({ ...user, [e.target.name]: e.target.value });
-    console.log(user);
+    // console.log(user);
   };
   const sucessAlert = () => (
     <div className="alert alert-success">
@@ -65,12 +65,12 @@ export default function AddChild({ setdp }) {
           email: user.email,
           password: user.pass1,
           fullName: user.fullName,
-          parentId : firebase.auth().currentUser.uid
+          parentId: firebase.auth().currentUser.uid,
         },
         (user, dp) => {
           setsuccess(true);
           setdp(dp);
-          console.log(user);
+          // console.log(user);
         },
         (err) => {
           seterror(true);

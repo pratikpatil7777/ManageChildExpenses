@@ -151,8 +151,11 @@ export default function RequestedMoneyV() {
   const history = useHistory();
   // const alert = useAlert();
 
+  // console.log("isParent+++++++" + isParent);
+
   return (
     <Fragment>
+      <h3>Request Money</h3>
       <div className="row" style={{ marginBottom: "7px" }}>
         {isParent === false ? (
           <div className="col-6 col-sm-6 col-md-6">
@@ -192,7 +195,10 @@ export default function RequestedMoneyV() {
                 requestMoney(
                   reqM,
                   (s) => {
-                    console.log("req success");
+                    // console.log("req success");
+                    alert("Money Requested Suceessfully");
+
+                    history.push("/");
                   },
                   (e) => {
                     console.log("req failed");
@@ -210,6 +216,7 @@ export default function RequestedMoneyV() {
               <thead>
                 <tr>
                   <th>Child Name</th>
+                  <th>Category</th>
                   <th>Amount</th>
                   <th>Status</th>
                   <th>Action</th>
@@ -220,6 +227,7 @@ export default function RequestedMoneyV() {
                   {allReqArr.map((reqq, idx) => (
                     <tr key={idx}>
                       <td>{reqq.childName}</td>
+                      <td>{reqq.category}</td>
                       <td>{reqq.buttonState === false ? reqq.amount : "-"}</td>
                       <td>
                         {reqq.buttonState === false ? reqq.state : "Done ✅"}
@@ -233,7 +241,7 @@ export default function RequestedMoneyV() {
                                 "Accept",
                                 reqq.amount,
                                 (s) => {
-                                  console.log("Req accepted");
+                                  // console.log("Req accepted");
                                   allReqArr[idx].buttonState = true;
                                   allReqArr[idx].buttonStatus =
                                     "Accepted Suceessfully";
@@ -250,10 +258,10 @@ export default function RequestedMoneyV() {
 
                               history.push("/");
 
-                              console.log(
-                                allReqArr,
-                                "Accepted........................."
-                              );
+                              // console.log(
+                              //   allReqArr,
+                              //   "Accepted........................."
+                              // );
                               // {
                               //   navigate("/requestedMoney");
                               // }
@@ -273,7 +281,7 @@ export default function RequestedMoneyV() {
                                 reqq.amount,
                                 "Deny",
                                 (s) => {
-                                  console.log("Req denied");
+                                  // console.log("Req denied");
                                   allReqArr[idx].buttonState = true;
                                   allReqArr[idx].buttonStatus =
                                     "Denied Suceessfully";
@@ -289,10 +297,10 @@ export default function RequestedMoneyV() {
                               alert("Transation Denied Suceessfully");
 
                               history.push("/");
-                              console.log(
-                                allReqArr,
-                                "Denied........................."
-                              );
+                              // console.log(
+                              //   allReqArr,
+                              //   "Denied........................."
+                              // );
                             }}
                           >
                             Deny

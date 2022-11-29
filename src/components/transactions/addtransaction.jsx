@@ -41,7 +41,7 @@ export default function Addtransaction() {
         user.uid,
         trans,
         (res) => {
-          console.log(res);
+          // console.log(res);
           setsuccess(true);
           settrans({
             type: "",
@@ -52,7 +52,7 @@ export default function Addtransaction() {
           });
         },
         (err) => {
-          console.log(err);
+          // console.log(err);
           seterrorBody(err);
           seterror(true);
         }

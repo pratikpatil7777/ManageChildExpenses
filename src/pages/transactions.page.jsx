@@ -5,7 +5,11 @@ import { getTransactionByFilter } from "./../firebase/transaction";
 import Spinner from "react-bootstrap/Spinner";
 import Empty from "./../components/general/empty.component";
 import { Button, Table } from "react-bootstrap";
-import { getCurrentUser, getAllTransactions } from "./../firebase/user";
+import {
+  getCurrentUser,
+  getAllTransactions,
+  getUserDataForName,
+} from "./../firebase/user";
 import fire from "./../firebase/fire";
 const labels = {
   ALL: "All",
@@ -25,24 +29,62 @@ export default function TransactionsV() {
     async function getmyTransactions() {
       let user = fire.auth().currentUser;
       let pd = await getAllTransactions(user.uid);
-      pd.forEach((element) => {
-        const dateFormat = new Date(1970, 0, 1);
-        dateFormat.setSeconds(element.timestamp.seconds);
-        const myDate =
-          dateFormat.getMonth() +
-          1 +
-          "/" +
-          dateFormat.getDate() +
-          "/" +
-          dateFormat.getFullYear();
-        graphData.push({
-          Date: myDate,
-          category: element.category,
-          Amount: element.amount,
-          Child: element.sender_id,
-          State: element.state,
-        });
-      });
+
+      await Promise.all(
+        pd.map(async (element) => {
+          //let element = pd[i];
+          //console.log(element.sender_id + "==");
+          await getUserDataForName(element.sender_id).then((reso) => {
+            //console.log(reso + "------");
+            if (reso != null) {
+              //console.log(reso + "------");
+              const dateFormat = new Date(1970, 0, 1);
+              dateFormat.setSeconds(element.timestamp.seconds);
+              const myDate =
+                dateFormat.getMonth() +
+                1 +
+                "/" +
+                dateFormat.getDate() +
+                "/" +
+                dateFormat.getFullYear();
+              graphData.push({
+                Date: myDate,
+                category: element.category,
+                Amount: element.amount,
+                Child: reso.name,
+                State: element.state,
+              });
+            }
+          });
+        })
+      );
+
+      // for (const i in pd) {
+      //   let element = pd[i];
+      //   console.log(element.sender_id + "==");
+      //   await getUserData(element.sender_id).then((reso) => {
+      //     if (reso != null) {
+      //       console.log(reso + "------");
+      //       const dateFormat = new Date(1970, 0, 1);
+      //       dateFormat.setSeconds(element.timestamp.seconds);
+      //       const myDate =
+      //         dateFormat.getMonth() +
+      //         1 +
+      //         "/" +
+      //         dateFormat.getDate() +
+      //         "/" +
+      //         dateFormat.getFullYear();
+      //       graphData.push({
+      //         Date: myDate,
+      //         category: element.category,
+      //         Amount: element.amount,
+      //         Child: reso.name,
+      //         State: element.state,
+      //       });
+      //     }
+      //   });
+      // }
+      //console.log("-0-0-0-0 " + graphData.length);
       setAllTrans(graphData);
       // setParentID(pd);
       // setReqM((prev) => {
@@ -98,14 +140,14 @@ export default function TransactionsV() {
   //     }
   //   });
   // }, [loc.pathname]);
-
+  //console.log("=-=-=-=-==" + allTrans);
   return (
     <Fragment>
       <h1>All Transactions</h1>
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th>Child ID</th>
+            <th>Child</th>
             <th>Amount</th>
             <th>Category</th>
             <th>Date</th>

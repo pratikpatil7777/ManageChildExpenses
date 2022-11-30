@@ -317,6 +317,22 @@ export const getAllTransactions = async (pId) => {
   return res;
 };
 
+
+export const getAllTransactionsForChild = async (cId) => {
+  //console.log("iddddddd", pId);
+  const db = fire.firestore();
+  let data = await db.collection("transactions").get();
+
+  let res = [];
+  data.docs.forEach((i) => {
+    if (i.data().sender_id === cId) {
+      res.push({ ...i.data(), id: i.id });
+    }
+  });
+  //console.log("RES:-" + res);
+  return res;
+};
+
 //Updating Document in FB Firestore
 export const updateUserData = (
   uid,

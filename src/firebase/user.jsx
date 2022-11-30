@@ -59,7 +59,7 @@ export const FBsignup = ({ email, password, fullName }, successFn, errorFn) => {
     });
 };
 
-export const addMoney = rateLimit(2, 1000, async (amount, successFn) => {
+export const addMoney = async (amount, successFn) => {
   const db = fire.firestore();
   let user = fire.auth().currentUser.uid;
 
@@ -79,64 +79,38 @@ export const addMoney = rateLimit(2, 1000, async (amount, successFn) => {
       }
     });
   successFn("Done!");
-});
+};
 
-export const parentResponseToChildRequest = rateLimit(
-  2,
-  1000,
-  async (transactionId, toBeState, amount, successFn, errorFn) => {
-    const db = fire.firestore();
+export const parentResponseToChildRequest = async (
+  transactionId,
+  toBeState,
+  amount,
+  successFn,
+  errorFn
+) => {
+  const db = fire.firestore();
 
-    try {
-      if (toBeState == "Accept") {
-        await db
-          .collection("transactions")
-          .doc(transactionId)
-          .get()
-          .then(async (reso) => {
-            if (reso.exists) {
-              //console.log("Document data:", reso.data().receiver_id);
-              let currWallet = 0;
-              let userId = reso.data().receiver_id;
-              await db
-                .collection("users")
-                .doc(userId)
-                .get()
-                .then(async (resp) => {
-                  //console.log("Document data:", resp.data().wallet);
-                  currWallet = resp.data().wallet;
-                  if (currWallet >= amount) {
-                    // console.log("Document data:", currWallet);
-                    currWallet -= amount;
-                    await db
-                      .collection("users")
-                      .doc(userId)
-                      .update({
-                        wallet: currWallet,
-                      })
-                      .catch((err) => errorFn(err));
-                  } else {
-                    throw "Not enough money!";
-                  }
-                });
-            }
-          });
-        await db
-          .collection("transactions")
-          .doc(transactionId)
-          .get()
-          .then(async (reso) => {
-            if (reso.exists) {
-              let currWallet = 0;
-              let userId = reso.data().sender_id;
-              await db
-                .collection("users")
-                .doc(userId)
-                .get()
-                .then(async (resp) => {
-                  currWallet = parseInt(resp.data().wallet);
-
-                  currWallet += parseInt(amount);
+  try {
+    if (toBeState == "Accept") {
+      await db
+        .collection("transactions")
+        .doc(transactionId)
+        .get()
+        .then(async (reso) => {
+          if (reso.exists) {
+            //console.log("Document data:", reso.data().receiver_id);
+            let currWallet = 0;
+            let userId = reso.data().receiver_id;
+            await db
+              .collection("users")
+              .doc(userId)
+              .get()
+              .then(async (resp) => {
+                //console.log("Document data:", resp.data().wallet);
+                currWallet = resp.data().wallet;
+                if (currWallet >= amount) {
+                  // console.log("Document data:", currWallet);
+                  currWallet -= amount;
                   await db
                     .collection("users")
                     .doc(userId)
@@ -144,95 +118,119 @@ export const parentResponseToChildRequest = rateLimit(
                       wallet: currWallet,
                     })
                     .catch((err) => errorFn(err));
-                });
-            }
-          });
-        db.collection("transactions")
-          .doc(transactionId)
-          .update({
-            state: "Done",
-          })
-          .catch((err) => errorFn(err));
-        successFn("Done!");
-      } else {
-        db.collection("transactions")
-          .doc(transactionId)
-          .update({
-            state: "Denied",
-          })
-          .catch((err) => errorFn(err));
-        successFn("Done!");
-      }
-    } catch (e) {
-      throw "Something went wrong!";
+                } else {
+                  throw "Not enough money!";
+                }
+              });
+          }
+        });
+      await db
+        .collection("transactions")
+        .doc(transactionId)
+        .get()
+        .then(async (reso) => {
+          if (reso.exists) {
+            let currWallet = 0;
+            let userId = reso.data().sender_id;
+            await db
+              .collection("users")
+              .doc(userId)
+              .get()
+              .then(async (resp) => {
+                currWallet = parseInt(resp.data().wallet);
+
+                currWallet += parseInt(amount);
+                await db
+                  .collection("users")
+                  .doc(userId)
+                  .update({
+                    wallet: currWallet,
+                  })
+                  .catch((err) => errorFn(err));
+              });
+          }
+        });
+      db.collection("transactions")
+        .doc(transactionId)
+        .update({
+          state: "Done",
+        })
+        .catch((err) => errorFn(err));
+      successFn("Done!");
+    } else {
+      db.collection("transactions")
+        .doc(transactionId)
+        .update({
+          state: "Denied",
+        })
+        .catch((err) => errorFn(err));
+      successFn("Done!");
     }
+  } catch (e) {
+    throw "Something went wrong!";
   }
-);
+};
 
 //func to create a child for logged parent
 //func need some changes, after child is created, the child gets logged in.
-export const createChild = rateLimit(
-  2,
-  1000,
-  ({ email, password, fullName, parentId }, successFn, errorFn) => {
-    //Random Number Gen Logic between 1 to 9 for DP
-    const db = fire.firestore();
-    //Firebase Authentication Signup
-    firebase
-      .auth()
-      .createUserWithEmailAndPassword(email, password)
-      .then(() => {
-        db.collection("users")
-          .doc(parentId)
-          .update({
-            children: firebase1.firestore.FieldValue.arrayUnion(
-              firebase.auth().currentUser.uid
-            ),
-          })
-          .then(() => {
-            //add child to the collection.
-            const childData = {
-              name: fullName,
-              email: email,
-              children: [],
-              wallet: 0,
-            };
+export const createChild = (
+  { email, password, fullName, parentId },
+  successFn,
+  errorFn
+) => {
+  //Random Number Gen Logic between 1 to 9 for DP
+  const db = fire.firestore();
+  //Firebase Authentication Signup
+  firebase
+    .auth()
+    .createUserWithEmailAndPassword(email, password)
+    .then(() => {
+      db.collection("users")
+        .doc(parentId)
+        .update({
+          children: firebase1.firestore.FieldValue.arrayUnion(
+            firebase.auth().currentUser.uid
+          ),
+        })
+        .then(() => {
+          //add child to the collection.
+          const childData = {
+            name: fullName,
+            email: email,
+            children: [],
+            wallet: 0,
+          };
 
-            db.collection("users")
-              .doc(firebase.auth().currentUser.uid)
-              .set({ id: firebase.auth().currentUser.uid, ...childData })
-              .then(() => {
-                // console.log("Pushed to Firestore");
-              })
-              .catch((er) => console.log(er));
-          })
-          .catch((er) => console.log(er));
-      })
-      .catch(function (error) {
-        console.log(error);
-        errorFn(error);
-      });
-  }
-);
+          db.collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .set({ id: firebase.auth().currentUser.uid, ...childData })
+            .then(() => {
+              // console.log("Pushed to Firestore");
+            })
+            .catch((er) => console.log(er));
+        })
+        .catch((er) => console.log(er));
+    })
+    .catch(function (error) {
+      console.log(error);
+      errorFn(error);
+    });
+};
 
 //Function to get user data
-export const getUserData = rateLimit(
-  2,
-  1000,
-  async (uid, successFn, errorFn) => {
-    const db = fire.firestore();
-    await db
-      .collection("users")
-      .doc(uid)
-      .get()
-      .then((res) => {
-        successFn(res.data());
-      })
-      .catch((err) => errorFn(err));
-  }
-);
+export const getUserData = async (uid, successFn, errorFn) => {
+  const db = fire.firestore();
+  await db
+    .collection("users")
+    .doc(uid)
+    .get()
+    .then((res) => {
+      successFn(res.data());
+    })
+    .catch((err) => errorFn(err));
+};
 
-export const getUserDataForName = rateLimit(2, 1000, async (uid) => {
+export const getUserDataForName = async (uid) => {
   var d;
   const db = fire.firestore();
   await db
@@ -245,44 +243,40 @@ export const getUserDataForName = rateLimit(2, 1000, async (uid) => {
       return;
     });
   return d;
-});
+};
 
-export const getSpecificUsers = rateLimit(
-  2,
-  1000,
-  (userIDs, successFn, errorFn) => {
-    const db = fire.firestore();
-    // console.log("senders: ", userIDs);
-    db.collection("users")
-      .where("id", "in", userIDs)
-      .get()
-      .then((res) => {
-        // console.log("length: ", res.docs.length);
-        const data = res.docs.map((i) => {
-          return i.data();
-        });
-        // console.log("data: ", data);
-        successFn(data);
-      })
-      .catch((err) => errorFn(err));
-  }
-);
+export const getSpecificUsers = (userIDs, successFn, errorFn) => {
+  const db = fire.firestore();
+  // console.log("senders: ", userIDs);
+  db.collection("users")
+    .where("id", "in", userIDs)
+    .get()
+    .then((res) => {
+      // console.log("length: ", res.docs.length);
+      const data = res.docs.map((i) => {
+        return i.data();
+      });
+      // console.log("data: ", data);
+      successFn(data);
+    })
+    .catch((err) => errorFn(err));
+};
 
 //getAllUsers
-export const getAllUser = rateLimit(2, 1000, async () => {
+export const getAllUser = async () => {
   const db = fire.firestore();
   let allUsers = await db.collection("users").get();
   allUsers = allUsers.docs.map((i) => {
     return i.data();
   });
-});
+};
 // const d1 = await getAllUser();
 // console.log("===="+d1)
 // getAllUser().then((data)=>{
 //   console.log("===="+data)
 // })
 
-export const getParentByChildId = rateLimit(2, 1000, async (childId) => {
+export const getParentByChildId = async (childId) => {
   const db = fire.firestore();
   let data1 = await db.collection("users").get();
   let child;
@@ -293,9 +287,9 @@ export const getParentByChildId = rateLimit(2, 1000, async (childId) => {
   });
 
   return child;
-});
+};
 
-export const getTransactionsById = rateLimit(2, 1000, async (pId) => {
+export const getTransactionsById = async (pId) => {
   const db = fire.firestore();
   let data = await db.collection("transactions").get();
 
@@ -306,9 +300,10 @@ export const getTransactionsById = rateLimit(2, 1000, async (pId) => {
     }
   });
   return res;
-});
+};
 
-export const getAllTransactions = rateLimit(2, 1000, async (pId) => {
+export const getAllTransactions = async (pId) => {
+  //console.log("iddddddd", pId);
   const db = fire.firestore();
   let data = await db.collection("transactions").get();
 
@@ -318,33 +313,35 @@ export const getAllTransactions = rateLimit(2, 1000, async (pId) => {
       res.push({ ...i.data(), id: i.id });
     }
   });
+  //console.log("RES:-" + res);
   return res;
-});
+};
 
 //Updating Document in FB Firestore
-export const updateUserData = rateLimit(
-  2,
-  1000,
-  (uid, { email, fullName, profilePic, address }, successFn, errorFn) => {
-    const db = fire.firestore();
-    db.collection("users")
-      .doc(uid)
-      .set(
-        {
-          email,
-          fullName,
-          profilePic,
-          address,
-        },
-        { merge: true }
-      )
-      .then(successFn)
-      .catch((err) => errorFn(err));
-  }
-);
+export const updateUserData = (
+  uid,
+  { email, fullName, profilePic, address },
+  successFn,
+  errorFn
+) => {
+  const db = fire.firestore();
+  db.collection("users")
+    .doc(uid)
+    .set(
+      {
+        email,
+        fullName,
+        profilePic,
+        address,
+      },
+      { merge: true }
+    )
+    .then(successFn)
+    .catch((err) => errorFn(err));
+};
 
 //Get Current User
-export const getCurrentUser = rateLimit(2, 1000, () => {
+export const getCurrentUser = () => {
   fire.auth().onAuthStateChanged(function (user) {
     if (user) {
       return user;
@@ -352,10 +349,10 @@ export const getCurrentUser = rateLimit(2, 1000, () => {
       console.log("NO user AUth Change");
     }
   });
-});
+};
 
 //Get all the Users List
-export const getUserList = rateLimit(2, 1000, (successFn, errorFn) => {
+export const getUserList = (successFn, errorFn) => {
   fetch("https://us-central1-vasoolimoney.cloudfunctions.net/app")
     .then((res) => res.json())
     .then((res) => {
@@ -363,4 +360,4 @@ export const getUserList = rateLimit(2, 1000, (successFn, errorFn) => {
       successFn(res);
     })
     .catch((err) => errorFn(err));
-});
+};
